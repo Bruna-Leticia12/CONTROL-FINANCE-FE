@@ -1,0 +1,133 @@
+.login-container {
+  background-color: #d5e6c9;
+  height: 100vh;
+  width: 100vw;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+  margin: 0;
+  padding: 0;
+}
+
+.login-card {
+  background-color: #ffffff;
+  border-radius: 25px;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
+  padding: 40px 36px;
+  width: 380px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin: 0 auto;
+  box-sizing: border-box;
+  position: relative;
+}
+
+.logo-image {
+  width: 160px;
+  height: auto;
+  margin-bottom: 10px;
+  object-fit: contain;
+  margin-top: 20px;
+}
+
+.subtitle {
+  font-size: 11px;
+  color: #333;
+  margin-bottom: 20px;
+  font-weight: 500;
+}
+
+.input-row {
+  width: 100%;
+  display: flex;
+  justify-content: center;
+  margin-bottom: 12px;
+}
+
+.input-group {
+  width: 260%;
+  margin: 0;
+}
+
+input[type="text"],
+input[type="password"] {
+  width: 100%;
+  padding: 10px 20px;
+  border: 2px solid #82c341;
+  border-radius: 20px;
+  outline: none;
+  font-size: 11px;
+  color: #333;
+  transition: border 0.3s ease;
+  box-sizing: border-box;
+}
+
+input[type="text"]:focus,
+input[type="password"]:focus {
+  border-color: #5ea02f;
+}
+
+.forgot-password {
+  width: 260px;
+  display: flex;
+  justify-content: flex-end;
+  margin: 0 0 18px;
+}
+
+.forgot-password a {
+  font-size: 11px;
+  color: #0a1633;
+  text-decoration: none;
+}
+
+.forgot-password a:hover {
+  text-decoration: underline;
+}
+
+.login-btn {
+  width: 100%;
+  background-color: #82c341;
+  border: none;
+  color: white;
+  padding: 10px;
+  border-radius: 20px;
+  font-size: 11px;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+  margin-top: 6px;
+}
+
+.login-btn:hover {
+  background-color: #6db82e;
+}
+
+.signup-text {
+  font-size: 11px;
+  color: #333;
+  margin-top: 15px;
+}
+
+.signup-text a {
+  color: #2a6b2e;
+  font-weight: 600;
+  text-decoration: none;
+}
+
+.signup-text a:hover {
+  text-decoration: underline;
+}
+
+@media (max-width: 480px) {
+  .login-card {
+    width: 90%;
+    padding: 24px;
+  }
+  
+  .input-group,
+  .forgot-password,
+  .login-btn {
+    width: 86%;
+  }
+}

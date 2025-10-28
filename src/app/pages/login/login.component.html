@@ -1,0 +1,39 @@
+<div class="login-container">
+  <div class="login-card">
+
+    <img 
+      src="../../../assets/images/logo-ctrlf.png"
+      class="logo-image"
+      alt="CTRL+F Logo"
+      (error)="onImageError($event)"
+    />
+
+    <h2 class="subtitle">Sign in to continue</h2>
+
+
+    <form [formGroup]="loginForm" (ngSubmit)="onSubmit()">
+      <div class="input-row">
+        <div class="input-group">
+          <input type="text" formControlName="cpf" placeholder="CPF" />
+        </div>
+      </div>
+
+      <div class="input-row">
+        <div class="input-group">
+          <input type="password" formControlName="password" placeholder="Password" />
+        </div>
+      </div>
+
+      <div class="forgot-password">
+        <a href="#">Forgot password?</a>
+      </div>
+
+      <button type="submit" class="login-btn">LOG IN</button>
+    </form>
+
+    <p class="signup-text">
+      New here? <a href="#">Create an account</a>
+    </p>
+
+  </div>
+</div>
