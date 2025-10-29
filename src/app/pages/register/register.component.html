@@ -1,0 +1,55 @@
+<div class="register-container">
+  <div class="register-card">
+
+    <img 
+      src="../../../assets/images/logo-ctrlf.png"
+      class="logo-image"
+      alt="CTRL+F Logo"
+      (error)="onImageError($event)"
+    />
+
+    <h2 class="subtitle">Create account</h2>
+
+    <form [formGroup]="registerForm" (ngSubmit)="onSubmit()">
+
+      <div class="input-row">
+        <input type="text" formControlName="name" placeholder="Name">
+      </div>
+
+      <div class="input-row">
+        <input type="email" formControlName="email" placeholder="E-mail">
+      </div>
+
+      <div class="input-row">
+        <input type="text" formControlName="cpf" placeholder="CPF">
+      </div>
+
+      <div class="input-row">
+        <input type="text" formControlName="phoneNumber" placeholder="Phone number">
+      </div>
+
+      <div class="input-row">
+        <input type="password" formControlName="password" placeholder="Password">
+      </div>
+
+      <div class="input-row">
+        <input type="password" formControlName="confirmPassword" placeholder="Confirm password">
+      </div>
+
+      <label class="terms-checkbox">
+        <input type="checkbox" formControlName="terms" />
+        <span>I accept the <a href="#">Terms and Conditions</a></span>
+      </label>
+
+      <button type="submit" class="register-btn" [disabled]="!registerForm.valid">
+        REGISTER
+      </button>
+
+    </form>
+
+    <p class="login-text">
+      Already have an account? <a routerLink="/login">Log in</a>
+    </p>
+
+  </div>
+</div>

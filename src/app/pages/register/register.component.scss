@@ -1,0 +1,132 @@
+.register-container {
+  background-color: #d5e6c9;
+  height: 100vh;
+  width: 100vw;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+  margin: 0;
+  padding: 0;
+}
+
+.register-card {
+  background-color: #ffffff;
+  border-radius: 25px;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
+  padding: 40px 36px;
+  width: 380px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin: 0 auto;
+  box-sizing: border-box;
+  position: relative;
+}
+
+.logo-image {
+  width: 160px;
+  height: auto;
+  margin-bottom: 20px;
+}
+
+.subtitle {
+  font-size: 12px;
+  margin-bottom: 20px;
+  color:#4d4b4b;
+;
+}
+
+.input-row {
+  width: 100%;
+  display: flex;
+  justify-content: center;
+  margin-bottom: 12px;
+}
+
+input {
+  width: 260px;
+  height: 36px;
+  padding: 0 20px;
+  border: 2px solid #82c341;
+  border-radius: 20px;
+  font-size: 12px;
+  outline: none;
+  box-sizing: border-box;
+}
+
+input:focus {
+  border-color: #5ea02f;
+}
+
+.terms-checkbox {
+  width: 260px;
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+  gap: 8px;
+  margin: 10px 0 10px;
+  font-size: 12px;
+  white-space: nowrap;
+  color:#4d4b4b;
+}
+
+.terms-checkbox input {
+  appearance: none;
+  width: 14px;
+  height:14px;
+  border: 2px solid #82c341;
+  border-radius: 50%;
+  background-color: #fff;
+  cursor: pointer;
+  transition: all 0.2s ease-in-out;
+  display: inline-block;
+  vertical-align: middle;
+  box-sizing: border-box;  
+  padding: 0;  
+}
+
+.terms-checkbox input:checked {
+  background-color: #82c341;
+}
+
+.terms-checkbox a {
+  color: #82c341;
+  font-weight: 600;
+  text-decoration: none;
+}
+
+.register-btn {
+  width: 260px;
+  height: 36px;
+  background-color: #82c341;
+  border: none;
+  color: #fff;
+  border-radius: 20px;
+  font-size: 11px;
+  font-weight: bold;
+  cursor: pointer;
+  margin-top: 8px;
+  transition: background-color 0.2s ease-in-out;
+}
+
+.register-btn:hover {
+  background-color: #6da12d;
+}
+
+.register-btn:disabled {
+  background-color: #b6d99a;
+  cursor: not-allowed;
+}
+
+.login-text {
+  font-size: 12px;
+  margin-top: 14px;
+  color:#4d4b4b;
+}
+
+.login-text a {
+  color: #82c341;
+  font-weight: 600;
+  text-decoration: none;
+}
