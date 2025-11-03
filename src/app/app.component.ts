@@ -1,24 +1,60 @@
 import { Component } from '@angular/core';
-import { RouterOutlet } from '@angular/router';
+import { RouterOutlet, Router, NavigationEnd } from '@angular/router';
+import { HeaderComponent } from './components/header/header.component';
+import { CommonModule } from '@angular/common';
+import { filter } from 'rxjs/operators';
 
 @Component({
   selector: 'app-root',
   standalone: true,
-  imports: [RouterOutlet],
+  imports: [CommonModule, HeaderComponent, RouterOutlet],
   template: `
-    <div class="app-container">
+    <ng-container *ngIf="showHeader">
+      <app-header></app-header>
+    </ng-container>
+
+    <main class="main-content" [class.no-header]="!showHeader">
       <router-outlet></router-outlet>
-    </div>
+    </main>
   `,
   styles: [`
-    .app-container {
-      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-      background-color: #f5f7fa;
-      min-height: 100vh;
+    :host {
+      display: block;
+      height: 100vh;
+      overflow: hidden;
+    }
+
+    .main-content {
+      padding-top: 84px;
       display: flex;
       justify-content: center;
-      align-items: center;
+      padding-left: 16px;
+      padding-right: 16px;
+      box-sizing: border-box;
+      background: #f5f7fa;
+      height: 100vh; /* ajustado: substitui min-height */
+      overflow-y: auto; /* evita corte de conteúdo e remove margem branca */
+    }
+
+    .main-content.no-header {
+      padding-top: 0;
+      background: #fff;
+      height: 100vh;
     }
   `]
 })
-export class AppComponent {}
+export class AppComponent {
+  showHeader = true;
+
+  constructor(private router: Router) {
+    this.router.events
+      .pipe(filter(event => event instanceof NavigationEnd))
+      .subscribe(() => {
+        const current = this.router.url;
+        this.showHeader = !(
+          current.startsWith('/login') ||
+          current.startsWith('/register')
+        );
+      });
+  }
+}

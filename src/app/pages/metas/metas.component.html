@@ -1,0 +1,50 @@
+<div class="metas-root">
+  <div class="alerts card">
+    <h4>Alertas</h4>
+    <div class="alerts-row">
+      <div class="alert-item">
+        <div class="alert-chart">
+          <canvas #alertPoupar></canvas>
+          <div class="center-text">
+            <div class="amount">R$ 500,00</div>
+            <div class="label">Poupar</div>
+          </div>
+        </div>
+        <div class="alert-expected">
+          Total esperado:<br /><span>R$ 600,00</span>
+        </div>
+      </div>
+
+      <div class="alert-item">
+        <div class="alert-chart">
+          <canvas #alertLazer></canvas>
+          <div class="center-text">
+            <div class="amount">R$ 550,00</div>
+            <div class="label">Lazer</div>
+          </div>
+        </div>
+        <div class="alert-expected">
+          Total esperado:<br /><span>R$ 450,00</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="goals card">
+    <h4>Metas</h4>
+    <div class="goals-content">
+      <div class="legend">
+        <div class="legend-item" *ngFor="let meta of metas; let i = index">
+          <div class="dot" [ngClass]="'dot' + (i + 1)">
+            {{ meta.percentual }}%
+          </div>
+          <span class="meta-nome">{{ meta.nome }}</span>
+        </div>
+      </div>
+
+      <div class="pie-wrap">
+        <canvas #pieCanvas></canvas>
+      </div>
+    </div>
+  </div>
+</div>

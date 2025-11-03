@@ -1,0 +1,62 @@
+<div class="balance-root">
+  <div class="panel card">
+    <h3>Balanço de gastos</h3>
+
+    <div class="donuts-grid">
+      <div class="donut-item">
+        <div class="chart-wrap">
+          <canvas #incomeCanvas></canvas>
+          <div class="center-text">
+            <div class="amount">R$ {{ data.renda.value | number:'1.0-0' }},00</div>
+            <div class="label">Renda</div>
+          </div>
+        </div>
+        <div class="expected">Total esperado:<br/><span>R$ {{ data.renda.expected | number:'1.0-0' }},00</span></div>
+      </div>
+
+      <div class="donut-item">
+        <div class="chart-wrap">
+          <canvas #fixedCanvas></canvas>
+          <div class="center-text">
+            <div class="amount">R$ {{ data.despesasFixas.value | number:'1.0-0' }},00</div>
+            <div class="label">Despesas fixas</div>
+          </div>
+        </div>
+        <div class="expected">Total esperado:<br/><span>R$ {{ data.despesasFixas.expected | number:'1.0-0' }},00</span></div>
+      </div>
+
+      <div class="donut-item">
+        <div class="chart-wrap">
+          <canvas #saveCanvas></canvas>
+          <div class="center-text">
+            <div class="amount">R$ {{ data.poupar.value | number:'1.0-0' }},00</div>
+            <div class="label">Poupar</div>
+          </div>
+        </div>
+        <div class="expected">Total esperado:<br/><span>R$ {{ data.poupar.expected | number:'1.0-0' }},00</span></div>
+      </div>
+
+      <div class="donut-item small">
+        <div class="chart-wrap">
+          <canvas #leisureCanvas></canvas>
+          <div class="center-text">
+            <div class="amount">R$ {{ data.lazer.value | number:'1.0-0' }},00</div>
+            <div class="label">Lazer</div>
+          </div>
+        </div>
+        <div class="expected">Total esperado:<br/><span>R$ {{ data.lazer.expected | number:'1.0-0' }},00</span></div>
+      </div>
+
+      <div class="donut-item small">
+        <div class="chart-wrap">
+          <canvas #unexpectedCanvas></canvas>
+          <div class="center-text">
+            <div class="amount">R$ {{ data.imprevistos.value | number:'1.0-0' }},00</div>
+            <div class="label">Imprevistos</div>
+          </div>
+        </div>
+        <div class="expected">Total esperado:<br/><span>R$ {{ data.imprevistos.expected | number:'1.0-0' }},00</span></div>
+      </div>
+    </div>
+  </div>
+</div>

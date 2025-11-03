@@ -1,0 +1,25 @@
+<header class="app-header">
+  <div class="header-inner">
+    <div class="logo">
+      <img src="assets/images/LOGO.svg" alt="CTRL+F" (error)="hideImage($event)" />
+    </div>
+
+    <div class="right-area">
+      <div class="last-update">Última atualização: 12:00h</div>
+
+      <div class="user-menu">
+        <button class="user-btn" (click)="toggleMenu()">
+          USER NAME
+          <span class="caret">▾</span>
+        </button>
+
+        <div class="dropdown" [class.open]="menuOpen">
+          <button (click)="navigate('/dashboard')">BALANÇO GERAL</button>
+          <button (click)="navigate('/metas')">METAS</button>
+          <button (click)="navigate('/transacoes')">TRANSAÇÕES</button>
+          <button (click)="logout()">SAIR</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</header>
