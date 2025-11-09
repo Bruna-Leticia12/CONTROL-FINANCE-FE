@@ -1,5 +1,5 @@
 export const environment = {
   production: false,
-
-  apiUrl: 'http://localhost:3000'
+  controlFinanceBackendUrl: 'http://localhost:2000',
+  bruna: 'http://localhost:6000',
 };

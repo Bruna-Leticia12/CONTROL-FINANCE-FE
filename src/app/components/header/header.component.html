@@ -7,10 +7,10 @@
     <div class="right-area">
       <div class="last-update">Última atualização: 12:00h</div>
 
-      <div class="user-menu">
-        <button class="user-btn" (click)="toggleMenu()">
-          USER NAME
-          <span class="caret">▾</span>
+    <div class="user-menu" *ngIf="showUserMenu">
+      <button class="user-btn" (click)="toggleMenu()">
+        USER NAME
+        <span class="caret">▾</span>
         </button>
 
         <div class="dropdown" [class.open]="menuOpen">

@@ -13,6 +13,10 @@ export class HeaderComponent {
   menuOpen = false;
 
   constructor(private router: Router) {}
+  
+  get showUserMenu(): boolean {
+  return this.router.url !== '/my-accounts';
+}
 
   toggleMenu() {
     this.menuOpen = !this.menuOpen;

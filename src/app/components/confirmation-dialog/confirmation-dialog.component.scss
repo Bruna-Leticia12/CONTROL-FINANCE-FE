@@ -1,0 +1,52 @@
+.dialog-container {
+  text-align: center;
+  padding: 28px 24px;
+  font-family: 'Roboto', sans-serif;
+  background: #fff;
+  border-radius: 16px;
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15);
+}
+
+.dialog-message {
+  font-size: 16px;
+  color: #333;
+  margin-bottom: 28px;
+  line-height: 1.5;
+}
+
+.dialog-actions {
+  display: flex;
+  justify-content: center;
+  gap: 20px;
+}
+
+.btn-allow,
+.btn-deny {
+  min-width: 120px;
+  padding: 10px 20px;
+  border-radius: 8px;
+  border: none;
+  cursor: pointer;
+  font-size: 15px;
+  font-weight: 600;
+  color: #fff;
+  transition: background-color 0.2s ease, transform 0.1s ease;
+}
+
+.btn-allow {
+  background-color: #4ad695ff;
+}
+
+.btn-allow:hover {
+  background-color: #41c987;
+  transform: translateY(-2px);
+}
+
+.btn-deny {
+  background-color: #f06d78ff;
+}
+
+.btn-deny:hover {
+  background-color: #e45d69;
+  transform: translateY(-2px);
+}

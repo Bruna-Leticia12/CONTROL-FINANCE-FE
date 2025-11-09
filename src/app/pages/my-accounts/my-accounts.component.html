@@ -1,0 +1,20 @@
+<div class="accounts-root">
+  <div class="card">
+    <h3>Minhas contas</h3>
+
+    <div class="accounts-grid">
+      @for (account of accounts; track account.name) {
+        <div
+          class="account-box"
+          [ngStyle]="{ 'background-color': account.color }"
+          (click)="startConnection(account.name)"
+        >
+          <div class="label">IF</div>
+          <div class="name">{{ account.name }}</div>
+        </div>
+      } @empty {
+        <p>Nenhuma conta encontrada.</p>
+      }
+    </div>
+  </div>
+</div>

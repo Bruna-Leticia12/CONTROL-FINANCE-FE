@@ -1,0 +1,74 @@
+.accounts-root {
+  width: 100%;
+  max-width: 920px;
+  margin: 0 auto;
+  padding: 48px 10px;
+  box-sizing: border-box;
+  font-family: 'Roboto', sans-serif;
+}
+
+.card {
+  background: #fff;
+  border-radius: 10px;
+  padding: 28px;
+  box-shadow: 0 8px 18px rgba(0, 0, 0, 0.06);
+  border: 1px solid rgba(0, 0, 0, 0.06);
+}
+
+.card h3 {
+  margin: 0 0 18px;
+  color: #666;
+  font-weight: 600;
+}
+
+.accounts-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 24px;
+  justify-items: center;
+  align-items: center;
+}
+
+.account-box {
+  width: 130px;
+  height: 130px;
+  border-radius: 16px;
+  color: #fff;
+  font-weight: 700;
+  text-align: center;
+  padding: 22px 10px;
+  box-shadow: 0 5px 10px rgba(0, 0, 0, 0.1);
+  transition: transform 0.2s ease;
+  cursor: pointer;
+
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+
+  .label {
+    font-size: 18px;
+    opacity: 0.9;
+  }
+
+  .name {
+    font-size: 16px;
+    margin-top: 6px;
+  }
+
+  &:hover {
+    transform: translateY(-4px);
+  }
+}
+
+@media (max-width: 600px) {
+  .accounts-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .account-box {
+    width: 100%;
+    max-width: 180px;
+    height: 120px;
+  }
+}
