@@ -29,15 +29,15 @@ export class MyAccountsComponent {
     private dialog: MatDialog
   ) {}
 
-  startConnection(IFName: string): void {
+  openStartConnectionDialog(IFName: string): void {
     const dialogRef = this.dialog.open(ConfirmationDialogComponent, {
       width: '400px',
       disableClose: true
     });
 
-    dialogRef.afterClosed().subscribe((allowed: boolean) => {
-      if (allowed) {
-        this.openFinanceConnectionService.startOpenFinanceConnection(IFName.toLowerCase()).subscribe(
+    dialogRef.afterClosed().subscribe((password: string) => {
+      if (password) {
+        this.openFinanceConnectionService.startOpenFinanceConnection(IFName.toLowerCase(), password).subscribe(
           (res: StartConnectionResponse) => {
             this.router.navigate(['/dashboard']); 
           }

@@ -10,8 +10,27 @@
 .dialog-message {
   font-size: 16px;
   color: #333;
-  margin-bottom: 28px;
+  margin-bottom: 20px;
   line-height: 1.5;
+}
+
+.input-container {
+  margin-bottom: 24px;
+}
+
+.password-input {
+  width: 100%;
+  max-width: 260px;
+  padding: 10px 14px;
+  border: 1px solid #ccc;
+  border-radius: 8px;
+  font-size: 15px;
+  outline: none;
+  transition: border-color 0.2s ease;
+}
+
+.password-input:focus {
+  border-color: #4ad695ff;
 }
 
 .dialog-actions {
@@ -37,9 +56,14 @@
   background-color: #4ad695ff;
 }
 
-.btn-allow:hover {
+.btn-allow:hover:enabled {
   background-color: #41c987;
   transform: translateY(-2px);
+}
+
+.btn-allow:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
 }
 
 .btn-deny {

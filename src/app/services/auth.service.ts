@@ -52,6 +52,10 @@ export class AuthService {
     return !!this.getToken();
   }
 
+  setCpf(cpf: string){
+    sessionStorage.setItem('cpf', cpf);
+  } 
+
   private handleError(error: HttpErrorResponse) {
     let message = 'Ocorreu um erro inesperado.';
     if (error.error?.message) {

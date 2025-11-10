@@ -46,6 +46,7 @@ export class LoginComponent {
       next: (res) => {
         if (res?.token) {
           this.auth.setToken(res.token);
+          this.auth.setCpf(cpf)
           this.router.navigate(['/my-accounts']);
         } else {
           this.errorMessage = 'Resposta inválida do servidor.';

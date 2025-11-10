@@ -7,7 +7,7 @@
         <div
           class="account-box"
           [ngStyle]="{ 'background-color': account.color }"
-          (click)="startConnection(account.name)"
+          (click)="openStartConnectionDialog(account.name)"
         >
           <div class="label">IF</div>
           <div class="name">{{ account.name }}</div>

@@ -1,6 +1,6 @@
 import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { Injectable } from '@angular/core';
-import { catchError, Observable, throwError } from 'rxjs';
+import { catchError, Observable, switchMap, throwError } from 'rxjs';
 import { environment } from '../../environments/environment';
 import { StartConnectionResponse } from '../../model/start-connection-response.interface';
 
@@ -12,7 +12,7 @@ export class OpenFinanceConnectionService {
 
   constructor(private http: HttpClient) { }
 
-  startOpenFinanceConnection(IFName: string): Observable<StartConnectionResponse> {
+  startOpenFinanceConnection(IFName: string, password: string): Observable<StartConnectionResponse> {
     const url = `${this.baseUrl}/start`;
 
     const headers = new HttpHeaders({
@@ -25,6 +25,7 @@ export class OpenFinanceConnectionService {
     };
 
     return this.http.post<StartConnectionResponse>(url, body, { headers }).pipe(
+      switchMap((res: StartConnectionResponse) => this.externalLogin(res, password)),
       catchError((error) => {
         console.error('Erro ao iniciar conexão Open Finance:', error);
 
@@ -45,5 +46,28 @@ export class OpenFinanceConnectionService {
         return throwError(() => new Error(errorMsg));
       })
     );
+  }
+
+  private externalLogin(startConnectionResponse: StartConnectionResponse, password: string) {
+    return this.http.post<any>(
+      startConnectionResponse.linkingUrl.split('?')[0],
+      {
+        cpf: sessionStorage.getItem('cpf'),
+        controlFinanceJwt: localStorage.getItem('ctrlf_token'),
+        password
+      },
+      {
+        params:
+        {
+          connectionId: startConnectionResponse.connectionId,
+          callbackUrl: startConnectionResponse.linkingUrl.split('callbackUrl=')[1]
+        }
+      }
+    ).pipe(
+      catchError((error) => {
+        const x = error 
+        return throwError(() => new Error(x)); 
+      })
+    )
   }
 }

@@ -4,8 +4,23 @@
     <strong>Open Finance</strong>.
   </p>
 
+  <div class="input-container">
+    <input
+      type="password"
+      [(ngModel)]="password"
+      placeholder="Informe sua senha"
+      class="password-input"
+    />
+  </div>
+
   <div class="dialog-actions">
-    <button class="btn-allow" (click)="onAllow()">Permitir</button>
+    <button
+      class="btn-allow"
+      [disabled]="!password.trim()"
+      (click)="onAllow()"
+    >
+      Permitir
+    </button>
     <button class="btn-deny" (click)="onDeny()">Não permitir</button>
   </div>
 </div>
