@@ -28,23 +28,14 @@ export class DashboardComponent implements AfterViewInit, OnDestroy {
   @ViewChild('unexpectedCanvas') unexpectedCanvas!: ElementRef<HTMLCanvasElement>;
 
   private charts: Chart[] = [];
-
   transactions: Transaction[] = [];
 
-  expectedValues = {
-    renda: 3000,
-    despesasFixas: 1800,
-    poupar: 600,
-    lazer: 450,
-    imprevistos: 150,
-  };
-
   data = {
-    renda: { value: 0, expected: this.expectedValues.renda },
-    despesasFixas: { value: 0, expected: this.expectedValues.despesasFixas },
-    poupar: { value: 0, expected: this.expectedValues.poupar },
-    lazer: { value: 0, expected: this.expectedValues.lazer },
-    imprevistos: { value: 0, expected: this.expectedValues.imprevistos },
+    renda: { value: 0, expected: 0 },
+    despesasFixas: { value: 0, expected: 0 },
+    poupar: { value: 0, expected: 0 },
+    lazer: { value: 0, expected: 0 },
+    imprevistos: { value: 0, expected: 0 },
   };
 
   constructor(private transactionService: TransactionService) {}
@@ -53,77 +44,11 @@ export class DashboardComponent implements AfterViewInit, OnDestroy {
     this.transactionService.loadTransactions().subscribe({
       next: (data: Transaction[]) => {
         this.transactions = data;
-        this.aggregateTransactions();
+        this.data = this.transactionService.getCategorySums(data);
         this.renderCharts();
       },
       error: (err) => console.error('Erro ao carregar transações', err),
     });
-  }
-
-  private aggregateTransactions(): void {
-    const rendaDesc = ['Salario'];
-    const despesaFixaDesc = [
-      'Financiamento',
-      'Aluguel',
-      'Água',
-      'Luz',
-      'Internet',
-      'Mercado',
-      'Transporte',
-      'Plano de Saúde',
-      'Medicamento',
-      'Streaming',
-      'Curso',
-    ];
-    const pouparDesc = ['Poupança', 'Investir'];
-    const lazerDesc = ['Viagem', 'Evento', 'Hobby', 'Restaurante', 'Pessoal'];
-    const imprevistosDesc = [
-      'Manutenção',
-      'Conserto',
-      'Multa',
-      'Taxa',
-      'Jogos',
-      'Apostas',
-    ];
-
-    const sums = {
-      renda: 0,
-      despesasFixas: 0,
-      poupar: 0,
-      lazer: 0,
-      imprevistos: 0,
-    };
-
-    for (const t of this.transactions) {
-      const desc = t.description?.toLowerCase() || '';
-      const amount = Number(t.amount);
-
-      if (rendaDesc.some((d) => desc.includes(d.toLowerCase()))) {
-        sums.renda += amount;
-      } else if (despesaFixaDesc.some((d) => desc.includes(d.toLowerCase()))) {
-        sums.despesasFixas += amount;
-      } else if (pouparDesc.some((d) => desc.includes(d.toLowerCase()))) {
-        sums.poupar += amount;
-      } else if (lazerDesc.some((d) => desc.includes(d.toLowerCase()))) {
-        sums.lazer += amount;
-      } else if (imprevistosDesc.some((d) => desc.includes(d.toLowerCase()))) {
-        sums.imprevistos += amount;
-      }
-    }
-
-    this.data = {
-      renda: { value: sums.renda, expected: this.expectedValues.renda },
-      despesasFixas: {
-        value: sums.despesasFixas,
-        expected: this.expectedValues.despesasFixas,
-      },
-      poupar: { value: sums.poupar, expected: this.expectedValues.poupar },
-      lazer: { value: sums.lazer, expected: this.expectedValues.lazer },
-      imprevistos: {
-        value: sums.imprevistos,
-        expected: this.expectedValues.imprevistos,
-      },
-    };
   }
 
   private renderCharts(): void {
@@ -152,14 +77,11 @@ export class DashboardComponent implements AfterViewInit, OnDestroy {
       this.unexpectedCanvas,
       this.data.imprevistos.value,
       this.data.imprevistos.expected,
-      '#c9f0c7'
+      '#f5c7c7'
     );
   }
 
-  private createDonutIncome(
-    canvasRef: ElementRef<HTMLCanvasElement>,
-    value: number
-  ) {
+  private createDonutIncome(canvasRef: ElementRef<HTMLCanvasElement>, value: number) {
     const ctx = canvasRef.nativeElement.getContext('2d')!;
     const chart = new Chart(ctx, {
       type: 'doughnut',
@@ -177,10 +99,7 @@ export class DashboardComponent implements AfterViewInit, OnDestroy {
         responsive: true,
         maintainAspectRatio: false,
         cutout: '78%',
-        plugins: {
-          tooltip: { enabled: false },
-          legend: { display: false },
-        },
+        plugins: { tooltip: { enabled: false }, legend: { display: false } },
         animation: { duration: 600 },
       },
     });
@@ -195,49 +114,29 @@ export class DashboardComponent implements AfterViewInit, OnDestroy {
   ) {
     const rendaValue = this.data.renda.value;
     const used = Math.min(value, rendaValue);
-    const remainderToRenda = Math.max(rendaValue - used, 0);
-    const hasDifference = value !== expected;
+    const diff = Math.abs(value - expected);
+    const hasDifference = diff > 0.01;
 
-    let dataParts: number[] = [];
-    let bgColors: string[] = [];
-
-    if (!hasDifference) {
-      dataParts = [used, remainderToRenda];
-      bgColors = [primaryColor, '#eafaf0'];
-    } else {
-      if (value > expected) {
-        const within = expected;
-        const over = value - expected;
-        dataParts = [within, over, remainderToRenda];
-        bgColors = [primaryColor, '#b51e1e', '#eafaf0'];
-      } else {
-        const within = value;
-        const missing = expected - value;
-        dataParts = [within, missing, remainderToRenda];
-        bgColors = [primaryColor, '#b51e1e', '#eafaf0'];
-      }
-    }
+    const dataParts = hasDifference
+      ? [Math.min(value, expected), diff, rendaValue - used]
+      : [used, rendaValue - used];
+    const bgColors = hasDifference
+      ? [primaryColor, '#b51e1e', '#eafaf0']
+      : [primaryColor, '#eafaf0'];
 
     const ctx = canvasRef.nativeElement.getContext('2d')!;
     const chart = new Chart(ctx, {
       type: 'doughnut',
       data: {
         datasets: [
-          {
-            data: dataParts,
-            backgroundColor: bgColors,
-            borderWidth: 0,
-          },
+          { data: dataParts, backgroundColor: bgColors, borderWidth: 0 },
         ],
       },
       options: {
         responsive: true,
         maintainAspectRatio: false,
         cutout: '78%',
-        plugins: {
-          tooltip: { enabled: false },
-          legend: { display: false },
-        },
+        plugins: { tooltip: { enabled: false }, legend: { display: false } },
         animation: { duration: 600 },
       },
     });

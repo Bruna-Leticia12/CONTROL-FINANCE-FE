@@ -3,7 +3,8 @@ import {
   AfterViewInit,
   OnDestroy,
   ViewChild,
-  ElementRef
+  ElementRef,
+  HostListener,
 } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import {
@@ -12,22 +13,23 @@ import {
   Tooltip,
   Legend,
   Plugin,
-  PieController
+  PieController,
+  DoughnutController,
 } from 'chart.js';
+import { TransactionService } from '../../services/transaction.service';
+import { Transaction } from '../../../model/transaction.interface';
 
-Chart.register(PieController, ArcElement, Tooltip, Legend);
+Chart.register(PieController, DoughnutController, ArcElement, Tooltip, Legend);
 
 @Component({
   selector: 'app-metas',
   standalone: true,
   imports: [CommonModule],
   templateUrl: './metas.component.html',
-  styleUrls: ['./metas.component.scss']
+  styleUrls: ['./metas.component.scss'],
 })
 export class MetasComponent implements AfterViewInit, OnDestroy {
   @ViewChild('pieCanvas') pieCanvas!: ElementRef<HTMLCanvasElement>;
-  @ViewChild('alertPoupar') alertPoupar!: ElementRef<HTMLCanvasElement>;
-  @ViewChild('alertLazer') alertLazer!: ElementRef<HTMLCanvasElement>;
 
   private chart?: Chart;
   private alertCharts: Chart[] = [];
@@ -37,30 +39,148 @@ export class MetasComponent implements AfterViewInit, OnDestroy {
     { nome: 'Despesas fixas', percentual: 60, cor: '#7fbf6a' },
     { nome: 'Poupar', percentual: 20, cor: '#9ee7a8' },
     { nome: 'Lazer', percentual: 15, cor: '#b5e3b3' },
-    { nome: 'Imprevistos', percentual: 5, cor: '#f5c7c7' }
+    { nome: 'Imprevistos', percentual: 5, cor: '#f5c7c7' },
   ];
 
+  renda = 0;
+  alertas: { nome: string; valor: number; esperado: number; cor: string }[] = [];
+  metasConcluidas = false;
+
+  constructor(private transactionService: TransactionService) {}
+
   ngAfterViewInit(): void {
+    this.loadData();
+  }
+
+  @HostListener('window:resize')
+  onResize() {
+    this.redrawCharts();
+  }
+
+  private loadData(): void {
+    this.transactionService.loadTransactions().subscribe({
+      next: (transactions: Transaction[]) => {
+        const categoryData = this.transactionService.getCategorySums(transactions);
+        this.renda = categoryData.renda.value;
+
+        this.alertas = [
+          {
+            nome: 'Despesas fixas',
+            valor: categoryData.despesasFixas.value,
+            esperado: categoryData.despesasFixas.expected,
+            cor: '#7fbf6a',
+          },
+          {
+            nome: 'Poupar',
+            valor: categoryData.poupar.value,
+            esperado: categoryData.poupar.expected,
+            cor: '#9ee7a8',
+          },
+          {
+            nome: 'Lazer',
+            valor: categoryData.lazer.value,
+            esperado: categoryData.lazer.expected,
+            cor: '#b5e3b3',
+          },
+          {
+            nome: 'Imprevistos',
+            valor: categoryData.imprevistos.value,
+            esperado: categoryData.imprevistos.expected,
+            cor: '#f5c7c7',
+          },
+        ].filter((a) => Math.abs(a.valor - a.esperado) > 0.01);
+
+        this.metasConcluidas = this.alertas.length === 0;
+
+        this.createMainPieChart();
+        this.gerarAlertas();
+      },
+      error: (err) => console.error('Erro ao carregar transações', err),
+    });
+  }
+
+  private redrawCharts(): void {
+    this.chart?.destroy();
+    this.alertCharts.forEach((c) => c.destroy());
+    this.alertCharts = [];
     this.createMainPieChart();
-    this.createAlertDonut(this.alertPoupar, 500, 600, '#c9f0c7');
-    this.createAlertDonut(this.alertLazer, 550, 450, '#c9f0c7');
+    this.gerarAlertas();
+  }
+
+  private gerarAlertas(): void {
+    const container = document.querySelector('.alerts-row');
+    if (!container) return;
+
+    container.innerHTML = '';
+
+    if (this.metasConcluidas) {
+      const msg = document.createElement('div');
+      msg.classList.add('alert-success');
+      msg.textContent = 'Metas do mês foram concluídas com sucesso!';
+      container.appendChild(msg);
+      return;
+    }
+
+    container.setAttribute(
+      'style',
+      `
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      gap: 2rem;
+      align-items: flex-start;
+      padding: 1rem;
+    `
+    );
+
+    for (const alerta of this.alertas) {
+      const div = document.createElement('div');
+      div.classList.add('alert-item');
+      div.setAttribute(
+        'style',
+        `
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        text-align: center;
+        gap: 0.5rem;
+        min-width: 180px;
+      `
+      );
+
+      div.innerHTML = `
+        <div class="alert-chart" style="position: relative; width: 150px; height: 150px;">
+          <canvas></canvas>
+          <div class="center-text" 
+               style="position:absolute; top:50%; left:50%; transform:translate(-50%,-50%);
+                      text-align:center; font-weight:600; color:#0a2b15;">
+            <div class="amount" style="font-size:1.1rem;">R$ ${alerta.valor
+              .toFixed(2)
+              .replace('.', ',')}</div>
+            <div class="label" style="font-size:0.9rem;">${alerta.nome}</div>
+          </div>
+        </div>
+        <div class="alert-expected" 
+             style="font-size:0.85rem; color:#444;">
+          Total esperado:<br><span style="font-weight:600;">R$ ${alerta.esperado
+            .toFixed(2)
+            .replace('.', ',')}</span>
+        </div>
+      `;
+      container.appendChild(div);
+
+      const canvas = div.querySelector('canvas') as HTMLCanvasElement;
+      this.createAlertDonut(canvas, alerta.valor, alerta.esperado, alerta.cor);
+    }
   }
 
   private createMainPieChart(): void {
-    if (this.chart) {
-      try { this.chart.destroy(); } catch (e) {}
-    }
+    if (this.chart) this.chart.destroy();
 
     const canvas = this.pieCanvas?.nativeElement;
-    if (!canvas) {
-      console.warn('Canvas do pie não encontrado');
-      return;
-    }
+    if (!canvas) return;
     const ctx = canvas.getContext('2d');
-    if (!ctx) {
-      console.warn('Context 2D não disponível no canvas do pie');
-      return;
-    }
+    if (!ctx) return;
 
     const metasParaGrafico = this.metas.filter((m) => m.nome !== 'Renda');
     const dataValues = metasParaGrafico.map((m) => m.percentual);
@@ -75,51 +195,29 @@ export class MetasComponent implements AfterViewInit, OnDestroy {
           const dataset = chart.data.datasets?.[0];
           if (!dataset) return;
           const meta = chart.getDatasetMeta(0);
-          if (!meta || !meta.data) return;
-          const total = (dataset.data as number[]).reduce((a, b) => a + (Number(b) || 0), 0);
+          const total = (dataset.data as number[]).reduce(
+            (a, b) => a + (Number(b) || 0),
+            0
+          );
           ctx.save();
           meta.data.forEach((element: any, index: number) => {
-            if (!element) return;
-            const startAngle = element.startAngle ?? element._model?.startAngle;
-            const endAngle = element.endAngle ?? element._model?.endAngle;
-            const outerRadius = element.outerRadius ?? element._model?.outerRadius;
-            const innerRadius = element.innerRadius ?? element._model?.innerRadius;
-            const x = element.x ?? element._model?.x;
-            const y = element.y ?? element._model?.y;
-
-            if (
-              startAngle == null ||
-              endAngle == null ||
-              outerRadius == null ||
-              innerRadius == null ||
-              x == null ||
-              y == null
-            ) {
-              return;
-            }
-
+            const { startAngle, endAngle, outerRadius, innerRadius, x, y } = element;
             const midAngle = (startAngle + endAngle) / 2;
             const radius = (outerRadius + innerRadius) / 2;
-            const px = x + Math.cos(midAngle) * radius;
-            const py = y + Math.sin(midAngle) * radius;
+            const px = x + Math.cos(midAngle) * radius * 0.75;
+            const py = y + Math.sin(midAngle) * radius * 0.75;
             const value = Number((dataset.data as number[])[index]) || 0;
             const percent = total > 0 ? Math.round((value / total) * 100) : 0;
 
-            let fill = '#fff';
-            const bg = (dataset.backgroundColor as string[])[index] || '#000';
-            if (this.isColorLight(bg)) fill = '#0a2b15';
-
-            ctx.fillStyle = fill;
-            ctx.font = '700 12px Roboto, system-ui, -apple-system';
+            ctx.fillStyle = '#0a2b15';
+            ctx.font = `${Math.max(10, radius / 6)}px Roboto, sans-serif`;
             ctx.textAlign = 'center';
             ctx.textBaseline = 'middle';
             ctx.fillText(`${percent}%`, px, py);
           });
           ctx.restore();
-        } catch (e) {
-
-        }
-      }
+        } catch {}
+      },
     };
 
     this.chart = new Chart(ctx, {
@@ -130,89 +228,62 @@ export class MetasComponent implements AfterViewInit, OnDestroy {
           {
             data: dataValues,
             backgroundColor: dataColors,
-            borderWidth: 0
-          }
-        ]
+            borderWidth: 0,
+          },
+        ],
       },
       options: {
         responsive: true,
         maintainAspectRatio: false,
-        animation: {
-          animateRotate: true,
-          duration: 600
-        },
-        plugins: {
-          legend: { display: false },
-          tooltip: { enabled: true }
-        }
+        animation: { duration: 600 },
+        layout: { padding: 10 },
+        plugins: { legend: { display: false }, tooltip: { enabled: true } },
       },
-      plugins: [textInsidePlugin]
+      plugins: [textInsidePlugin],
     });
   }
 
-  private isColorLight(hex: string): boolean {
-    try {
-      let h = hex.replace('#', '');
-      if (h.length === 3) {
-        h = h.split('').map(ch => ch + ch).join('');
-      }
-      const r = parseInt(h.substring(0, 2), 16);
-      const g = parseInt(h.substring(2, 4), 16);
-      const b = parseInt(h.substring(4, 6), 16);
-      const luminance = (0.299 * r + 0.587 * g + 0.114 * b) / 255;
-      return luminance > 0.7; 
-    } catch {
-      return false;
-    }
-  }
-
   private createAlertDonut(
-    canvasRef: ElementRef<HTMLCanvasElement>,
+    canvas: HTMLCanvasElement,
     value: number,
     expected: number,
     primaryColor: string
   ) {
-    if (!canvasRef || !canvasRef.nativeElement) return;
+    if (!canvas) return;
+
     const within = Math.min(value, expected);
     const diff = Math.abs(value - expected);
-    const hasDiff = diff > 0;
+    const hasDiff = diff > 0.01;
     const dataParts = hasDiff ? [within, diff] : [within];
     const colors = hasDiff ? [primaryColor, '#b51e1e'] : [primaryColor];
 
-    const ctx = canvasRef.nativeElement.getContext('2d')!;
+    const ctx = canvas.getContext('2d')!;
     const chart = new Chart(ctx, {
       type: 'doughnut',
       data: {
         datasets: [
-          {
-            data: dataParts,
-            backgroundColor: colors,
-            borderWidth: 0
-          }
-        ]
+          { data: dataParts, backgroundColor: colors, borderWidth: 0 },
+        ],
       },
       options: {
         responsive: true,
         maintainAspectRatio: false,
         cutout: '78%',
-        animation: {
-          animateRotate: true,
-          duration: 500
-        },
-        plugins: {
-          legend: { display: false },
-          tooltip: { enabled: false }
-        }
-      }
+        animation: { duration: 400 },
+        plugins: { legend: { display: false }, tooltip: { enabled: false } },
+      },
     });
-
     this.alertCharts.push(chart);
   }
 
   ngOnDestroy(): void {
-    try { this.chart?.destroy(); } catch {}
+    try {
+      this.chart?.destroy();
+    } catch {}
     this.alertCharts.forEach((c) => {
-      try { c.destroy(); } catch {}
+      try {
+        c.destroy();
+      } catch {}
     });
   }
 }
