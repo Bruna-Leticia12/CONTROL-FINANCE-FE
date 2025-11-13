@@ -1,6 +1,6 @@
 import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { Injectable } from '@angular/core';
-import { catchError, Observable, switchMap, throwError } from 'rxjs';
+import { catchError, Observable, switchMap, tap, throwError } from 'rxjs';
 import { environment } from '../../environments/environment';
 import { StartConnectionResponse } from '../../model/start-connection-response.interface';
 
@@ -21,6 +21,7 @@ export class OpenFinanceConnectionService {
     });
 
     const body = {
+      // targetApiUrl: this.getIfName(IFName)
       targetApiUrl: environment.bruna
     };
 
@@ -49,6 +50,8 @@ export class OpenFinanceConnectionService {
   }
 
   private externalLogin(startConnectionResponse: StartConnectionResponse, password: string) {
+    sessionStorage.setItem('connectionId', startConnectionResponse.connectionId);
+
     return this.http.post<any>(
       startConnectionResponse.linkingUrl.split('?')[0],
       {
@@ -64,10 +67,20 @@ export class OpenFinanceConnectionService {
         }
       }
     ).pipe(
+      tap((data) => sessionStorage.setItem('customerId', data.customerId)),
       catchError((error) => {
         const x = error 
         return throwError(() => new Error(x)); 
       })
     )
   }
+
+  // private getIfName(IFName: string){
+  //   if(IFName === "bruna"){
+  //     return environment.bruna
+  //   }
+  //   else if ((IFName === "larissa")){
+  //     return environment.larissa
+  //   }
+  // }
 }

@@ -24,7 +24,7 @@ export class AuthService {
     password: string;
   }): Observable<any> {
     const url = `${this.baseUrl}/register`;
-    return this.http.post(url, payload).pipe(
+    return this.http.post(url, payload).pipe(      
       catchError(this.handleError)
     );
   }

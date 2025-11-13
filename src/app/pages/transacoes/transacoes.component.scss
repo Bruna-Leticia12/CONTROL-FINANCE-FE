@@ -1,0 +1,72 @@
+.transactions-root {
+  width: 100%;
+  max-width: 900px;
+  margin: 20px auto;
+  background: #fff;
+  border-radius: 10px;
+  padding: 28px;
+  box-shadow: 0 8px 18px rgba(0, 0, 0, 0.06);
+  border: 1px solid rgba(0, 0, 0, 0.06);
+}
+
+h3 {
+  margin-bottom: 20px;
+  color: #555;
+  font-weight: 600;
+  font-size: 20px;
+}
+
+.transactions-table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.transactions-table th,
+.transactions-table td {
+  padding: 12px 10px;
+  border-bottom: 1px solid #eee;
+  text-align: left;
+  font-size: 15px;
+}
+
+.transactions-table th.right,
+.transactions-table td.right {
+  text-align: right;
+}
+
+.transactions-table tbody tr:hover {
+  background: #f9f9f9;
+}
+
+.debit {
+  color: #d9534f;
+  font-weight: 600;
+}
+
+.credit {
+  color: #1f7a56;
+  font-weight: 600;
+}
+
+.balance-row td {
+  font-weight: 600;
+  border-top: 2px solid #ccc;
+}
+
+.total {
+  font-size: 16px;
+  color: #333;
+}
+
+.empty-state,
+.loading-state,
+.error-state {
+  text-align: center;
+  color: #777;
+  font-size: 15px;
+  margin-top: 40px;
+}
+
+.error-state {
+  color: #d9534f;
+}

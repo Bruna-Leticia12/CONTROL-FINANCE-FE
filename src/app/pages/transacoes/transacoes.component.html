@@ -1,0 +1,48 @@
+<div class="transactions-root card" *ngIf="!loading && !error">
+  <h3>Extrato de Transações</h3>
+
+  @if (transactions.length > 0) {
+    <table class="transactions-table">
+      <thead>
+        <tr>
+          <th>Data</th>
+          <th>Descrição</th>
+          <th class="right">Valor</th>
+        </tr>
+      </thead>
+      <tbody>
+        @for (t of transactions; track t._id) {
+          <tr>
+            <td>{{ t.date | date:'dd/MM/yyyy' }}</td>
+            <td>{{ t.description }}</td>
+            <td
+              class="right"
+              [class.debit]="t.type === 'debit'"
+              [class.credit]="t.type === 'credit'"
+            >
+              {{ formatAmount(t) }}
+            </td>
+          </tr>
+        }
+      </tbody>
+      <tfoot>
+        <tr class="balance-row">
+          <td colspan="2">Saldo</td>
+          <td class="right total">
+            R$ {{ balance.toFixed(2).replace('.', ',') }}
+          </td>
+        </tr>
+      </tfoot>
+    </table>
+  } @else {
+    <div class="empty-state">Nenhuma transação encontrada.</div>
+  }
+</div>
+
+@if (loading) {
+  <div class="loading-state">Carregando extrato...</div>
+}
+
+@if (error) {
+  <div class="error-state">{{ error }}</div>
+}
