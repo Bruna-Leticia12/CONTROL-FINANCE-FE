@@ -5,12 +5,13 @@ import { MatDialog, MatDialogModule } from '@angular/material/dialog';
 import { OpenFinanceConnectionService } from '../../services/open-finance-connection.service';
 import { StartConnectionResponse } from '../../../model/start-connection-response.interface';
 import { ConfirmationDialogComponent } from '../../components/confirmation-dialog/confirmation-dialog.component';
+import { AiAgentComponent } from '../../components/ai-agent/ai-agent.component';
 
 
 @Component({
   selector: 'app-my-accounts',
   standalone: true,
-  imports: [CommonModule, MatDialogModule],
+  imports: [CommonModule, MatDialogModule, AiAgentComponent],
   templateUrl: './my-accounts.component.html',
   styleUrls: ['./my-accounts.component.scss']
 })

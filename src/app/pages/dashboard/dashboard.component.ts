@@ -10,13 +10,14 @@ import { RouterModule } from '@angular/router';
 import { Chart, ArcElement, Tooltip, Legend } from 'chart.js';
 import { TransactionService } from '../../services/transaction.service';
 import { Transaction } from '../../../model/transaction.interface';
+import { AiAgentComponent } from '../../components/ai-agent/ai-agent.component';
 
 Chart.register(ArcElement, Tooltip, Legend);
 
 @Component({
   selector: 'app-dashboard',
   standalone: true,
-  imports: [CommonModule, RouterModule],
+  imports: [CommonModule, RouterModule, AiAgentComponent],
   templateUrl: './dashboard.component.html',
   styleUrls: ['./dashboard.component.scss'],
 })
