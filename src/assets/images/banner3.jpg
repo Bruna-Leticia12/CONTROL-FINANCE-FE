@@ -1,0 +1,14 @@
+<svg width="1920" height="250" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="grad3" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" style="stop-color:#f59e0b;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#ef4444;stop-opacity:1" />
+    </linearGradient>
+  </defs>
+  <rect width="1920" height="250" fill="url(#grad3)"/>
+  <circle cx="1600" cy="50" r="120" fill="rgba(255,255,255,0.1)"/>
+  <circle cx="1680" cy="180" r="90" fill="rgba(255,255,255,0.08)"/>
+  <path d="M 1500 125 L 1550 80 L 1600 110 L 1650 70 L 1700 100 L 1750 60" stroke="rgba(255,255,255,0.3)" stroke-width="4" fill="none"/>
+  <text x="80" y="110" font-family="Arial, sans-serif" font-size="42" font-weight="bold" fill="white">Análises detalhadas</text>
+  <text x="80" y="150" font-family="Arial, sans-serif" font-size="18" fill="rgba(255,255,255,0.9)">Visualize seus dados financeiros com gráficos interativos</text>
+</svg>

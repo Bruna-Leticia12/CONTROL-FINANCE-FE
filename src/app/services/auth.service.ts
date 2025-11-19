@@ -14,7 +14,7 @@ export interface LoginResponse {
 export class AuthService {
   private baseUrl = 'http://localhost:4000/auth';
 
-  constructor(private http: HttpClient) {}
+  constructor(private http: HttpClient) { }
 
   register(payload: {
     name: string;
@@ -24,7 +24,7 @@ export class AuthService {
     password: string;
   }): Observable<any> {
     const url = `${this.baseUrl}/register`;
-    return this.http.post(url, payload).pipe(      
+    return this.http.post(url, payload).pipe(
       catchError(this.handleError)
     );
   }
@@ -45,16 +45,29 @@ export class AuthService {
   }
 
   logout() {
+    // Limpar TUDO do localStorage
     localStorage.removeItem('ctrlf_token');
+
+    // Limpar TUDO do sessionStorage (connectionId, customerId, cpf, etc)
+    sessionStorage.clear();
+
+    console.log('Logout completo - todos os dados limpos');
   }
 
   isLoggedIn(): boolean {
-    return !!this.getToken();
+    const token = this.getToken();
+    if (!token) {
+      return false;
+    }
+
+    // Opcional: validar se o token não expirou (JWT decode)
+    // Por enquanto, apenas verifica se existe
+    return true;
   }
 
-  setCpf(cpf: string){
+  setCpf(cpf: string) {
     sessionStorage.setItem('cpf', cpf);
-  } 
+  }
 
   private handleError(error: HttpErrorResponse) {
     let message = 'Ocorreu um erro inesperado.';

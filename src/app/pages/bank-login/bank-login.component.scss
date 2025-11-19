@@ -1,0 +1,270 @@
+.bank-login-container {
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: linear-gradient(135deg, #f5f7fa 0%, #e9ecef 100%);
+    padding: 20px;
+}
+
+.bank-login-card {
+    background: #fff;
+    border-radius: 16px;
+    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.1);
+    max-width: 440px;
+    width: 100%;
+    overflow: hidden;
+    animation: slideUp 0.3s ease-out;
+}
+
+.bank-header {
+    background: var(--bank-gradient, linear-gradient(135deg, #6ec33a 0%, #5fb02d 100%));
+    color: #fff;
+    padding: 40px 32px;
+    text-align: center;
+
+    .bank-logo {
+        margin-bottom: 16px;
+
+        svg {
+            filter: drop-shadow(0 2px 8px rgba(0, 0, 0, 0.2));
+            animation: fadeIn 0.5s ease-out;
+        }
+    }
+
+    .bank-name {
+        font-size: 28px;
+        font-weight: 700;
+        margin: 0 0 8px;
+        letter-spacing: 0.5px;
+    }
+
+    .bank-subtitle {
+        font-size: 14px;
+        opacity: 0.9;
+        margin: 0;
+        font-weight: 300;
+    }
+}
+
+.login-form {
+    padding: 32px;
+}
+
+.info-box {
+    background: #f8fafc;
+    border-left: 4px solid var(--bank-primary, #6ec33a);
+    padding: 16px;
+    border-radius: 8px;
+    margin-bottom: 28px;
+    display: flex;
+    align-items: flex-start;
+    gap: 12px;
+
+    svg {
+        flex-shrink: 0;
+        margin-top: 2px;
+        color: var(--bank-primary, #6ec33a);
+    }
+
+    p {
+        margin: 0;
+        font-size: 14px;
+        color: #555;
+        line-height: 1.5;
+    }
+}
+
+.form-group {
+    margin-bottom: 20px;
+
+    label {
+        display: block;
+        font-size: 14px;
+        font-weight: 600;
+        color: #333;
+        margin-bottom: 8px;
+    }
+
+    input {
+        width: 100%;
+        padding: 12px 16px;
+        border: 2px solid #e0e0e0;
+        border-radius: 8px;
+        font-size: 15px;
+        transition: all 0.2s ease;
+        box-sizing: border-box;
+
+        &:focus {
+            outline: none;
+            border-color: var(--bank-primary, #6ec33a);
+            box-shadow: 0 0 0 3px rgba(110, 195, 58, 0.1);
+        }
+
+        &:disabled {
+            background: #f5f5f5;
+            cursor: not-allowed;
+        }
+
+        &::placeholder {
+            color: #aaa;
+        }
+    }
+}
+
+.error-message {
+    background: #fee;
+    border-left: 4px solid #e63946;
+    color: #c92a2a;
+    padding: 12px 16px;
+    border-radius: 8px;
+    font-size: 14px;
+    margin-bottom: 20px;
+    animation: shake 0.3s ease-out;
+}
+
+.form-actions {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.btn-login,
+.btn-cancel {
+    width: 100%;
+    padding: 14px 24px;
+    border-radius: 8px;
+    font-size: 15px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    border: none;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+}
+
+.btn-login {
+    background: var(--bank-gradient, linear-gradient(135deg, #6ec33a 0%, #5fb02d 100%));
+    color: #fff;
+
+    &:hover:not(:disabled) {
+        transform: translateY(-2px);
+        box-shadow: 0 6px 20px rgba(110, 195, 58, 0.3);
+    }
+
+    &:disabled {
+        opacity: 0.6;
+        cursor: not-allowed;
+        transform: none;
+    }
+}
+
+.btn-cancel {
+    background: transparent;
+    color: #666;
+    border: 2px solid #e0e0e0;
+
+    &:hover:not(:disabled) {
+        background: #f8fafc;
+        border-color: #ccc;
+    }
+
+    &:disabled {
+        opacity: 0.5;
+        cursor: not-allowed;
+    }
+}
+
+.loading-spinner {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+
+    svg {
+        animation: spin 1s linear infinite;
+    }
+}
+
+.security-footer {
+    padding: 20px 32px;
+    background: #f8fafc;
+    border-top: 1px solid #e9ecef;
+}
+
+.security-badge {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    font-size: 13px;
+    color: #666;
+
+    svg {
+        color: var(--bank-primary, #6ec33a);
+    }
+}
+
+@keyframes slideUp {
+    from {
+        opacity: 0;
+        transform: translateY(30px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+    }
+
+    to {
+        opacity: 1;
+    }
+}
+
+@keyframes shake {
+
+    0%,
+    100% {
+        transform: translateX(0);
+    }
+
+    25% {
+        transform: translateX(-10px);
+    }
+
+    75% {
+        transform: translateX(10px);
+    }
+}
+
+@keyframes spin {
+    from {
+        transform: rotate(0deg);
+    }
+
+    to {
+        transform: rotate(360deg);
+    }
+}
+
+@media (max-width: 500px) {
+    .bank-login-card {
+        border-radius: 0;
+        max-width: 100%;
+    }
+
+    .bank-header {
+        padding: 32px 24px;
+    }
+
+    .login-form {
+        padding: 24px;
+    }
+}

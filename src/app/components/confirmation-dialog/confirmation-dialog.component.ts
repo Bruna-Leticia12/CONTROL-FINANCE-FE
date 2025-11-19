@@ -1,8 +1,12 @@
-import { Component } from '@angular/core';
+import { Component, Inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { MatDialogModule, MatDialogRef } from '@angular/material/dialog';
+import { MatDialogModule, MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
 import { MatButtonModule } from '@angular/material/button';
+
+export interface ConfirmationDialogData {
+  bankName: string;
+}
 
 @Component({
   selector: 'app-confirmation-dialog',
@@ -12,17 +16,20 @@ import { MatButtonModule } from '@angular/material/button';
   styleUrls: ['./confirmation-dialog.component.scss'],
 })
 export class ConfirmationDialogComponent {
-  password: string = '';
+  bankName: string;
 
-  constructor(private dialogRef: MatDialogRef<ConfirmationDialogComponent>) {}
-
-  onAllow(): void {
-    if (this.password.trim()) {
-      this.dialogRef.close(this.password);
-    }
+  constructor(
+    private dialogRef: MatDialogRef<ConfirmationDialogComponent>,
+    @Inject(MAT_DIALOG_DATA) public data: ConfirmationDialogData
+  ) {
+    this.bankName = data.bankName;
   }
 
-  onDeny(): void {
+  onConfirm(): void {
+    this.dialogRef.close(true);
+  }
+
+  onCancel(): void {
     this.dialogRef.close(false);
   }
 }

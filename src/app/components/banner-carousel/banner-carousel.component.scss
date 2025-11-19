@@ -1,0 +1,223 @@
+.carousel-container {
+    position: relative;
+    width: 100%;
+    height: 350px;
+    overflow: hidden;
+    background: #f8fafc;
+    contain: layout style paint;
+}
+
+.carousel-track {
+    display: flex;
+    height: 100%;
+    width: 100%;
+}
+
+.carousel-slide {
+    position: relative;
+    flex: 0 0 100%;
+    width: 100%;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.carousel-slide img {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    object-position: center;
+    min-height: 350px;
+}
+
+.banner-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: linear-gradient(to right,
+            rgba(0, 0, 0, 0.6) 0%,
+            rgba(0, 0, 0, 0.3) 50%,
+            rgba(0, 0, 0, 0.1) 100%);
+    z-index: 1;
+}
+
+.banner-content {
+    position: absolute;
+    left: 80px;
+    z-index: 2;
+    color: white;
+    max-width: 600px;
+}
+
+.banner-title {
+    margin: 0 0 8px 0;
+    font-size: 42px;
+    font-weight: 800;
+    letter-spacing: -1px;
+    text-shadow: 0 2px 12px rgba(0, 0, 0, 0.4);
+    line-height: 1.2;
+}
+
+.banner-subtitle {
+    margin: 0;
+    font-size: 18px;
+    font-weight: 500;
+    opacity: 0.95;
+    text-shadow: 0 1px 8px rgba(0, 0, 0, 0.3);
+}
+
+/* Navigation Buttons */
+.carousel-btn {
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    background: rgba(255, 255, 255, 0.9);
+    border: none;
+    width: 48px;
+    height: 48px;
+    border-radius: 50%;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 3;
+    transition: background 0.2s ease, transform 0.2s ease, box-shadow 0.2s ease;
+    box-shadow: 0 2px 12px rgba(0, 0, 0, 0.15);
+    will-change: transform;
+
+    &:hover {
+        background: white;
+        transform: translateY(-50%) scale(1.1);
+        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.25);
+    }
+
+    &:active {
+        transform: translateY(-50%) scale(0.95);
+    }
+
+    svg {
+        color: #334155;
+    }
+}
+
+.carousel-btn.prev {
+    left: 24px;
+}
+
+.carousel-btn.next {
+    right: 24px;
+}
+
+/* Indicators */
+.carousel-indicators {
+    position: absolute;
+    bottom: 20px;
+    left: 50%;
+    transform: translateX(-50%);
+    display: flex;
+    gap: 10px;
+    z-index: 3;
+}
+
+.indicator {
+    width: 12px;
+    height: 12px;
+    border-radius: 50%;
+    border: 2px solid white;
+    background: rgba(255, 255, 255, 0.3);
+    cursor: pointer;
+    transition: background 0.2s ease, width 0.2s ease, transform 0.2s ease;
+    padding: 0;
+    will-change: width, transform;
+
+    &:hover {
+        background: rgba(255, 255, 255, 0.6);
+        transform: scale(1.2);
+    }
+
+    &.active {
+        background: white;
+        width: 32px;
+        border-radius: 6px;
+    }
+}
+
+/* Responsive */
+@media (max-width: 900px) {
+    .carousel-container {
+        height: 280px;
+    }
+
+    .carousel-slide img {
+        min-height: 280px;
+    }
+
+    .banner-content {
+        left: 40px;
+        max-width: 500px;
+    }
+
+    .banner-title {
+        font-size: 32px;
+    }
+
+    .banner-subtitle {
+        font-size: 16px;
+    }
+
+    .carousel-btn {
+        width: 40px;
+        height: 40px;
+    }
+
+    .carousel-btn.prev {
+        left: 16px;
+    }
+
+    .carousel-btn.next {
+        right: 16px;
+    }
+}
+
+@media (max-width: 600px) {
+    .carousel-container {
+        height: 220px;
+    }
+
+    .carousel-slide img {
+        min-height: 220px;
+    }
+
+    .banner-content {
+        left: 24px;
+        right: 24px;
+        max-width: 100%;
+    }
+
+    .banner-title {
+        font-size: 24px;
+    }
+
+    .banner-subtitle {
+        font-size: 14px;
+    }
+
+    .carousel-btn {
+        width: 36px;
+        height: 36px;
+    }
+
+    .carousel-btn.prev {
+        left: 12px;
+    }
+
+    .carousel-btn.next {
+        right: 12px;
+    }
+}

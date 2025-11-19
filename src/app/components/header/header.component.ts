@@ -1,6 +1,7 @@
 import { Component } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterModule, Router } from '@angular/router';
+import { AuthService } from '../../services/auth.service';
 
 @Component({
   selector: 'app-header',
@@ -12,11 +13,14 @@ import { RouterModule, Router } from '@angular/router';
 export class HeaderComponent {
   menuOpen = false;
 
-  constructor(private router: Router) {}
-  
+  constructor(
+    private router: Router,
+    private authService: AuthService
+  ) { }
+
   get showUserMenu(): boolean {
-  return this.router.url !== '/my-accounts';
-}
+    return this.router.url !== '/my-accounts';
+  }
 
   toggleMenu() {
     this.menuOpen = !this.menuOpen;
@@ -29,10 +33,15 @@ export class HeaderComponent {
 
   logout() {
     this.menuOpen = false;
+
+    // Limpa TUDO: localStorage + sessionStorage
+    this.authService.logout();
+
+    // Redireciona para login
     this.router.navigate(['/login']);
   }
 
-    hideImage(event: Event) {
+  hideImage(event: Event) {
     const img = event.target as HTMLImageElement;
     if (img) img.style.display = 'none';
   }

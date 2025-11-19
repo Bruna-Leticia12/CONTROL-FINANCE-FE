@@ -28,23 +28,32 @@ export class MyAccountsComponent {
     private openFinanceConnectionService: OpenFinanceConnectionService,
     private router: Router,
     private dialog: MatDialog
-  ) {}
+  ) { }
 
   openStartConnectionDialog(IFName: string): void {
     const dialogRef = this.dialog.open(ConfirmationDialogComponent, {
-      width: '400px',
-      disableClose: true
+      width: '480px',
+      disableClose: true,
+      data: { bankName: IFName }
     });
 
-    dialogRef.afterClosed().subscribe((password: string) => {
-      if (password) {
-        this.openFinanceConnectionService.startOpenFinanceConnection(IFName.toLowerCase(), password).subscribe(
+    dialogRef.afterClosed().subscribe((confirmed: boolean) => {
+      if (confirmed) {
+        this.openFinanceConnectionService.startOpenFinanceConnection(IFName.toLowerCase()).subscribe(
           (res: StartConnectionResponse) => {
-            this.router.navigate(['/dashboard']); 
+            // Redirecionar para tela de login do banco
+            this.router.navigate(['/bank-login'], {
+              queryParams: {
+                connectionId: res.connectionId,
+                callbackUrl: res.linkingUrl.split('callbackUrl=')[1],
+                bank: IFName,
+                linkingUrl: res.linkingUrl
+              }
+            });
           }
         );
       } else {
-        console.log('Usuário não permitiu o compartilhamento.');
+        console.log('Usuário cancelou a conexão.');
       }
     });
   }
