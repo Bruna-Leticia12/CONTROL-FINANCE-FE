@@ -94,6 +94,18 @@
           color: #22c55e;
           transform: translateX(4px);
         }
+
+        &.logout-btn {
+          margin-top: 4px;
+          border-top: 1px solid #e5e7eb;
+          padding-top: 12px;
+          color: #dc2626;
+
+          &:hover {
+            background: #fef2f2;
+            color: #dc2626;
+          }
+        }
       }
     }
 

@@ -1,74 +1,297 @@
-.accounts-root {
-  width: 100%;
-  max-width: 920px;
+.my-accounts-container {
+  max-width: 1200px;
   margin: 0 auto;
-  padding: 48px 10px;
-  box-sizing: border-box;
+  padding: 32px 24px;
   font-family: 'Roboto', sans-serif;
 }
 
-.card {
-  background: #fff;
-  border-radius: 10px;
-  padding: 28px;
-  box-shadow: 0 8px 18px rgba(0, 0, 0, 0.06);
-  border: 1px solid rgba(0, 0, 0, 0.06);
+.page-header {
+  margin-bottom: 32px;
+
+  .page-title {
+    font-size: 32px;
+    font-weight: 700;
+    color: #1a1a1a;
+    margin: 0 0 8px 0;
+  }
+
+  .page-subtitle {
+    font-size: 16px;
+    color: #666;
+    margin: 0;
+  }
 }
 
-.card h3 {
-  margin: 0 0 18px;
-  color: #666;
-  font-weight: 600;
-}
-
-.accounts-grid {
-  display: grid;
-  grid-template-columns: repeat(2, 1fr);
-  gap: 24px;
-  justify-items: center;
-  align-items: center;
-}
-
-.account-box {
-  width: 130px;
-  height: 130px;
-  border-radius: 16px;
-  color: #fff;
-  font-weight: 700;
-  text-align: center;
-  padding: 22px 10px;
-  box-shadow: 0 5px 10px rgba(0, 0, 0, 0.1);
-  transition: transform 0.2s ease;
-  cursor: pointer;
-
+.loading-state {
   display: flex;
   flex-direction: column;
-  justify-content: center;
   align-items: center;
+  justify-content: center;
+  padding: 60px 20px;
 
-  .label {
-    font-size: 18px;
-    opacity: 0.9;
+  .spinner {
+    width: 40px;
+    height: 40px;
+    border: 4px solid #f3f3f3;
+    border-top: 4px solid #2b6b4a;
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
   }
 
-  .name {
-    font-size: 16px;
-    margin-top: 6px;
-  }
-
-  &:hover {
-    transform: translateY(-4px);
+  p {
+    margin-top: 16px;
+    color: #666;
+    font-size: 14px;
   }
 }
 
-@media (max-width: 600px) {
-  .accounts-grid {
-    grid-template-columns: 1fr;
+@keyframes spin {
+  0% {
+    transform: rotate(0deg);
   }
 
-  .account-box {
+  100% {
+    transform: rotate(360deg);
+  }
+}
+
+.banks-list {
+  display: grid;
+  gap: 24px;
+}
+
+.bank-card {
+  background: #fff;
+  border-radius: 16px;
+  padding: 24px;
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.08);
+  border: 2px solid transparent;
+  transition: all 0.3s ease;
+
+  &:hover {
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.12);
+    border-color: var(--bank-color);
+  }
+}
+
+.bank-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 16px;
+}
+
+.bank-info {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+.bank-icon {
+  width: 56px;
+  height: 56px;
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: white;
+  flex-shrink: 0;
+}
+
+.bank-details {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.bank-name {
+  font-size: 20px;
+  font-weight: 600;
+  color: #1a1a1a;
+  margin: 0;
+}
+
+.bank-status {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 13px;
+  color: #999;
+  font-weight: 500;
+
+  .status-dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background-color: #d1d1d1;
+  }
+
+  &.connected {
+    color: #2b6b4a;
+
+    .status-dot {
+      background-color: #2b6b4a;
+      animation: pulse 2s ease-in-out infinite;
+    }
+  }
+}
+
+@keyframes pulse {
+
+  0%,
+  100% {
+    opacity: 1;
+  }
+
+  50% {
+    opacity: 0.5;
+  }
+}
+
+.connect-btn {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 20px;
+  background-color: var(--bank-color);
+  color: white;
+  border: none;
+  border-radius: 8px;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+
+  &:hover {
+    opacity: 0.9;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  }
+
+  &:active {
+    transform: translateY(0);
+  }
+}
+
+.accounts-section {
+  border-top: 1px solid #e5e5e5;
+  padding-top: 16px;
+}
+
+.accounts-list {
+  display: grid;
+  gap: 12px;
+}
+
+.account-item {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 16px;
+  background: #f9f9f9;
+  border-radius: 12px;
+  border: 1px solid #e5e5e5;
+  transition: all 0.2s ease;
+
+  &:hover {
+    background: #f5f5f5;
+    border-color: var(--bank-color);
+  }
+}
+
+.account-icon {
+  width: 40px;
+  height: 40px;
+  border-radius: 8px;
+  background: white;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--bank-color);
+  flex-shrink: 0;
+  border: 1px solid #e5e5e5;
+}
+
+.account-info {
+  flex: 1;
+
+  .account-type {
+    font-size: 15px;
+    font-weight: 600;
+    color: #1a1a1a;
+    margin-bottom: 4px;
+  }
+
+  .account-number {
+    font-size: 13px;
+    color: #666;
+    font-family: 'Courier New', monospace;
+  }
+
+  .account-branch {
+    font-size: 12px;
+    color: #999;
+    margin-top: 2px;
+  }
+}
+
+.no-accounts,
+.error-message {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 32px 16px;
+  text-align: center;
+  color: #999;
+
+  svg {
+    margin-bottom: 12px;
+    opacity: 0.5;
+  }
+
+  p {
+    margin: 0;
+    font-size: 14px;
+  }
+}
+
+.error-message {
+  color: #d32f2f;
+  flex-direction: row;
+  gap: 8px;
+  padding: 16px;
+  background: #ffebee;
+  border-radius: 8px;
+
+  svg {
+    margin: 0;
+    opacity: 1;
+  }
+
+  span {
+    font-size: 14px;
+    font-weight: 500;
+  }
+}
+
+@media (max-width: 768px) {
+  .my-accounts-container {
+    padding: 24px 16px;
+  }
+
+  .page-header .page-title {
+    font-size: 24px;
+  }
+
+  .bank-header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 16px;
+  }
+
+  .connect-btn {
     width: 100%;
-    max-width: 180px;
-    height: 120px;
+    justify-content: center;
   }
 }

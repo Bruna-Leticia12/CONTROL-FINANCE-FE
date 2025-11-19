@@ -13,6 +13,7 @@ import { MatDialog, MatDialogModule } from '@angular/material/dialog';
 import { Chart, ArcElement, Tooltip, Legend } from 'chart.js';
 import { TransactionService } from '../../services/transaction.service';
 import { OpenFinanceConnectionService } from '../../services/open-finance-connection.service';
+import { AuthService } from '../../services/auth.service';
 import { Transaction } from '../../../model/transaction.interface';
 import { StartConnectionResponse } from '../../../model/start-connection-response.interface';
 import { AiAgentComponent } from '../../components/ai-agent/ai-agent.component';
@@ -72,24 +73,45 @@ export class DashboardComponent implements OnInit, AfterViewInit, OnDestroy {
   constructor(
     private transactionService: TransactionService,
     private openFinanceService: OpenFinanceConnectionService,
+    private authService: AuthService,
     private router: Router,
     private dialog: MatDialog
   ) { }
 
   ngOnInit(): void {
-    // Verificar se há conexão ativa
+    // Tentar buscar conexões ativas do backend (caso o sessionStorage esteja vazio)
     const connectionId = sessionStorage.getItem('connectionId');
-    const customerId = sessionStorage.getItem('customerId');
+
+    if (!connectionId || connectionId === 'null') {
+      console.log('🔄 SessionStorage vazio - tentando restaurar conexões...');
+      this.authService.restoreActiveConnections().subscribe({
+        next: () => {
+          console.log('✅ Conexões restauradas no Dashboard');
+          this.updateBankStatus();
+        },
+        error: (err) => {
+          console.warn('⚠️ Nenhuma conexão ativa encontrada ou erro ao restaurar:', err);
+        }
+      });
+    } else {
+      console.log('✅ ConnectionId já presente no sessionStorage');
+      this.updateBankStatus();
+    }
+  }
+
+  private updateBankStatus(): void {
+    const connectionId = sessionStorage.getItem('connectionId');
     const connectedBank = sessionStorage.getItem('connectedBank');
 
-    console.log('Dashboard init - connectionId:', connectionId, 'customerId:', customerId, 'bank:', connectedBank);
+    console.log('🔍 Verificando status - connectionId:', connectionId, 'bank:', connectedBank);
 
-    // Atualizar status do banco conectado
-    if (connectionId && customerId && connectedBank) {
+    if (connectionId && connectedBank) {
       const bank = this.bankAccounts.find(b => b.name.toLowerCase() === connectedBank.toLowerCase());
       if (bank) {
         bank.isConnected = true;
-        console.log(`Banco ${bank.name} marcado como conectado`);
+        console.log(`✅ Banco ${bank.name} marcado como conectado`);
+      } else {
+        console.warn(`⚠️ Banco ${connectedBank} não encontrado na lista`);
       }
     }
   }

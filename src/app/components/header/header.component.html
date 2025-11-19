@@ -7,17 +7,17 @@
     <div class="right-area">
       <div class="last-update">Última atualização: 12:00h</div>
 
-    <div class="user-menu" *ngIf="showUserMenu">
-      <button class="user-btn" (click)="toggleMenu()">
-        USER NAME
-        <span class="caret">▾</span>
+      <div class="user-menu" *ngIf="showUserMenu">
+        <button class="user-btn" (click)="toggleMenu()">
+          {{ userName }}
+          <span class="caret">▾</span>
         </button>
 
         <div class="dropdown" [class.open]="menuOpen">
-          <button (click)="navigate('/dashboard')">BALANÇO GERAL</button>
-          <button (click)="navigate('/metas')">METAS</button>
-          <button (click)="navigate('/transacoes')">TRANSAÇÕES</button>
-          <button (click)="logout()">SAIR</button>
+          <button *ngFor="let item of filteredMenuItems" (click)="navigate(item.path)">
+            {{ item.label }}
+          </button>
+          <button class="logout-btn" (click)="logout()">SAIR</button>
         </div>
       </div>
     </div>
