@@ -1,62 +1,148 @@
-<div class="balance-root">
-  <div class="panel card">
-    <h3>Balanço de gastos</h3>
+<!-- Banner Carousel (Full Width) -->
+<div class="carousel-wrapper">
+  <app-banner-carousel></app-banner-carousel>
+</div>
 
-    <div class="donuts-grid">
-      <div class="donut-item">
-        <div class="chart-wrap">
-          <canvas #incomeCanvas></canvas>
-          <div class="center-text">
-            <div class="amount">R$ {{ data.renda.value | number:'1.0-0' }},00</div>
-            <div class="label">Renda</div>
+<!-- Dashboard Content -->
+<div class="dashboard-container">
+  <!-- Grid Principal: Saldos + Gráficos -->
+  <div class="main-content">
+    <div class="main-grid">
+      <!-- Coluna Esquerda: Resumo Financeiro -->
+      <section class="financial-summary">
+        <div class="summary-card income">
+          <div class="summary-icon">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <line x1="12" y1="1" x2="12" y2="23" />
+              <path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6" />
+            </svg>
+          </div>
+          <div class="summary-content">
+            <p class="summary-label">Renda Mensal</p>
+            <h2 class="summary-value">R$ {{ monthlyIncome | number:'1.2-2' }}</h2>
           </div>
         </div>
-        <div class="expected">Total esperado:<br/><span>R$ {{ data.renda.expected | number:'1.0-0' }},00</span></div>
-      </div>
 
-      <div class="donut-item">
-        <div class="chart-wrap">
-          <canvas #fixedCanvas></canvas>
-          <div class="center-text">
-            <div class="amount">R$ {{ data.despesasFixas.value | number:'1.0-0' }},00</div>
-            <div class="label">Despesas fixas</div>
+        <div class="summary-card expenses">
+          <div class="summary-icon">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M21 12H3M21 6H3M21 18H3" />
+            </svg>
+          </div>
+          <div class="summary-content">
+            <p class="summary-label">Despesas</p>
+            <h2 class="summary-value">R$ {{ monthlyExpenses | number:'1.2-2' }}</h2>
           </div>
         </div>
-        <div class="expected">Total esperado:<br/><span>R$ {{ data.despesasFixas.expected | number:'1.0-0' }},00</span></div>
-      </div>
 
-      <div class="donut-item">
-        <div class="chart-wrap">
-          <canvas #saveCanvas></canvas>
-          <div class="center-text">
-            <div class="amount">R$ {{ data.poupar.value | number:'1.0-0' }},00</div>
-            <div class="label">Poupar</div>
+        <div class="summary-card balance" [class.positive]="totalBalance >= 0" [class.negative]="totalBalance < 0">
+          <div class="summary-icon">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M3 3v18h18" />
+              <path d="M18 17V9" />
+              <path d="M13 17V5" />
+              <path d="M8 17v-3" />
+            </svg>
+          </div>
+          <div class="summary-content">
+            <p class="summary-label">Saldo</p>
+            <h2 class="summary-value">R$ {{ totalBalance | number:'1.2-2' }}</h2>
           </div>
         </div>
-        <div class="expected">Total esperado:<br/><span>R$ {{ data.poupar.expected | number:'1.0-0' }},00</span></div>
-      </div>
+      </section>
 
-      <div class="donut-item small">
-        <div class="chart-wrap">
-          <canvas #leisureCanvas></canvas>
-          <div class="center-text">
-            <div class="amount">R$ {{ data.lazer.value | number:'1.0-0' }},00</div>
-            <div class="label">Lazer</div>
+      <!-- Coluna Direita: Gráficos -->
+      <section class="charts-section">
+        <div class="section-header">
+          <h3 class="section-title-small">Balanço de Gastos</h3>
+        </div>
+
+        @if (hasTransactions) {
+        <div class="charts-grid">
+          <div class="chart-card">
+            <div class="chart-wrap">
+              <canvas #incomeCanvas></canvas>
+              <div class="center-text">
+                <div class="amount">R$ {{ data.renda.value | number:'1.0-0' }},00</div>
+                <div class="label">Renda</div>
+              </div>
+            </div>
+            <div class="expected">Total esperado: <span>R$ {{ data.renda.expected | number:'1.0-0' }},00</span></div>
+          </div>
+
+          <div class="chart-card">
+            <div class="chart-wrap">
+              <canvas #fixedCanvas></canvas>
+              <div class="center-text">
+                <div class="amount">R$ {{ data.despesasFixas.value | number:'1.0-0' }},00</div>
+                <div class="label">Despesas fixas</div>
+              </div>
+            </div>
+            <div class="expected">Total esperado: <span>R$ {{ data.despesasFixas.expected | number:'1.0-0' }},00</span>
+            </div>
+          </div>
+
+          <div class="chart-card">
+            <div class="chart-wrap">
+              <canvas #saveCanvas></canvas>
+              <div class="center-text">
+                <div class="amount">R$ {{ data.poupar.value | number:'1.0-0' }},00</div>
+                <div class="label">Poupar</div>
+              </div>
+            </div>
+            <div class="expected">Total esperado: <span>R$ {{ data.poupar.expected | number:'1.0-0' }},00</span></div>
+          </div>
+
+          <div class="chart-card small">
+            <div class="chart-wrap">
+              <canvas #leisureCanvas></canvas>
+              <div class="center-text">
+                <div class="amount">R$ {{ data.lazer.value | number:'1.0-0' }},00</div>
+                <div class="label">Lazer</div>
+              </div>
+            </div>
+            <div class="expected">Total esperado: <span>R$ {{ data.lazer.expected | number:'1.0-0' }},00</span></div>
+          </div>
+
+          <div class="chart-card small">
+            <div class="chart-wrap">
+              <canvas #unexpectedCanvas></canvas>
+              <div class="center-text">
+                <div class="amount">R$ {{ data.imprevistos.value | number:'1.0-0' }},00</div>
+                <div class="label">Imprevistos</div>
+              </div>
+            </div>
+            <div class="expected">Total esperado: <span>R$ {{ data.imprevistos.expected | number:'1.0-0' }},00</span>
+            </div>
           </div>
         </div>
-        <div class="expected">Total esperado:<br/><span>R$ {{ data.lazer.expected | number:'1.0-0' }},00</span></div>
-      </div>
-
-      <div class="donut-item small">
-        <div class="chart-wrap">
-          <canvas #unexpectedCanvas></canvas>
-          <div class="center-text">
-            <div class="amount">R$ {{ data.imprevistos.value | number:'1.0-0' }},00</div>
-            <div class="label">Imprevistos</div>
-          </div>
+        } @else {
+        <div class="empty-charts">
+          <app-empty-state title="Sem dados financeiros"
+            description="Conecte uma conta bancária para visualizar seus gráficos e análises detalhadas" icon="chart">
+          </app-empty-state>
         </div>
-        <div class="expected">Total esperado:<br/><span>R$ {{ data.imprevistos.expected | number:'1.0-0' }},00</span></div>
-      </div>
+        }
+      </section>
     </div>
   </div>
+
+  <!-- Seção de Bancos (Full Width) -->
+  <div class="banks-full-width">
+    <section class="banks-section">
+      <div class="section-header">
+        <h2 class="section-title">Suas Contas Bancárias</h2>
+        <p class="section-subtitle">Conecte seus bancos via Open Finance</p>
+      </div>
+
+      <div class="banks-grid">
+        @for (account of bankAccounts; track account.name) {
+        <app-bank-card [account]="account" (connectClick)="onConnectBank($event)">
+        </app-bank-card>
+        }
+      </div>
+    </section>
+  </div>
 </div>
+
+<app-ai-agent></app-ai-agent>

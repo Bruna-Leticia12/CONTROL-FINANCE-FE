@@ -12,7 +12,7 @@ export class OpenFinanceConnectionService {
 
   constructor(private http: HttpClient) { }
 
-  startOpenFinanceConnection(IFName: string, password: string): Observable<StartConnectionResponse> {
+  startOpenFinanceConnection(bankName: string): Observable<StartConnectionResponse> {
     const url = `${this.baseUrl}/start`;
 
     const headers = new HttpHeaders({
@@ -20,13 +20,16 @@ export class OpenFinanceConnectionService {
       'Authorization': `Bearer ${localStorage.getItem('ctrlf_token')}`
     });
 
+    const targetApiUrl = this.getIfUrl(bankName);
+    if (!targetApiUrl) {
+      return throwError(() => new Error(`Instituição Financeira "${bankName}" não encontrada`));
+    }
+
     const body = {
-      // targetApiUrl: this.getIfName(IFName)
-      targetApiUrl: environment.bruna
+      targetApiUrl
     };
 
     return this.http.post<StartConnectionResponse>(url, body, { headers }).pipe(
-      switchMap((res: StartConnectionResponse) => this.externalLogin(res, password)),
       catchError((error) => {
         console.error('Erro ao iniciar conexão Open Finance:', error);
 
@@ -49,38 +52,37 @@ export class OpenFinanceConnectionService {
     );
   }
 
-  private externalLogin(startConnectionResponse: StartConnectionResponse, password: string) {
-    sessionStorage.setItem('connectionId', startConnectionResponse.connectionId);
+  completeOpenFinanceConnection(
+    connectionId: string,
+    apiKey: string,
+    userIdInChildApi: string,
+    consentIdInChildApi: string
+  ): Observable<any> {
+    const url = `${this.baseUrl}/complete`;
 
-    return this.http.post<any>(
-      startConnectionResponse.linkingUrl.split('?')[0],
-      {
-        cpf: sessionStorage.getItem('cpf'),
-        controlFinanceJwt: localStorage.getItem('ctrlf_token'),
-        password
-      },
-      {
-        params:
-        {
-          connectionId: startConnectionResponse.connectionId,
-          callbackUrl: startConnectionResponse.linkingUrl.split('callbackUrl=')[1]
-        }
-      }
-    ).pipe(
-      tap((data) => sessionStorage.setItem('customerId', data.customerId)),
+    const headers = new HttpHeaders({
+      'Content-Type': 'application/json',
+      'Authorization': `Bearer ${localStorage.getItem('ctrlf_token')}`
+    });
+
+    const body = {
+      connectionId,
+      apiKey,
+      userIdInChildApi,
+      consentIdInChildApi
+    };
+
+    return this.http.patch(url, body, { headers }).pipe(
       catchError((error) => {
-        const x = error 
-        return throwError(() => new Error(x)); 
+        console.error('Erro ao completar conexão:', error);
+        return throwError(() => new Error('Falha ao completar conexão'));
       })
-    )
+    );
   }
 
-  // private getIfName(IFName: string){
-  //   if(IFName === "bruna"){
-  //     return environment.bruna
-  //   }
-  //   else if ((IFName === "larissa")){
-  //     return environment.larissa
-  //   }
-  // }
+  private getIfUrl(bankName: string): string | null {
+    const normalizedName = bankName.toLowerCase();
+    const institutions = environment.institutionsFinancial as Record<string, string>;
+    return institutions[normalizedName] || null;
+  }
 }

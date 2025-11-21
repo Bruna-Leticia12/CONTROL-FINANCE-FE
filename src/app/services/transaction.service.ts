@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import { environment } from '../../environments/environment';
-import { catchError, Observable, switchMap, throwError } from 'rxjs';
+import { catchError, Observable, of, switchMap, throwError } from 'rxjs';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
 
 @Injectable({
@@ -9,7 +9,7 @@ import { HttpClient, HttpHeaders } from '@angular/common/http';
 export class TransactionService {
   private baseUrl = environment.controlFinanceBackendUrl + '/open-finance';
 
-  constructor(private http: HttpClient) {}
+  constructor(private http: HttpClient) { }
 
   getToken() {
     const token = localStorage.getItem('ctrlf_token');
@@ -17,6 +17,24 @@ export class TransactionService {
   }
 
   loadTransactions(): Observable<any> {
+    const connectionId = sessionStorage.getItem('connectionId');
+
+    console.log('🔍 [TransactionService] Verificando connectionId:', connectionId);
+    console.log('📦 [TransactionService] SessionStorage completo:', {
+      connectionId: sessionStorage.getItem('connectionId'),
+      customerId: sessionStorage.getItem('customerId'),
+      connectedBank: sessionStorage.getItem('connectedBank'),
+      cpf: sessionStorage.getItem('cpf')
+    });
+
+    // Se não houver connectionId, retornar array vazio ao invés de fazer requisição
+    if (!connectionId || connectionId === 'null') {
+      console.warn('⚠️ Nenhuma conexão ativa - retornando array vazio');
+      return of([]);
+    }
+
+    console.log('✅ ConnectionId válido, buscando accounts...');
+
     return this.getAccounts().pipe(
       switchMap((res: any) => this.getTransactions(res))
     );
@@ -32,11 +50,16 @@ export class TransactionService {
   }
 
   private getAccounts() {
-    const url = `${this.baseUrl}/${sessionStorage.getItem('connectionId')}/customers/${sessionStorage.getItem('customerId')}/accounts`;
+    const connectionId = sessionStorage.getItem('connectionId');
+    const url = `${this.baseUrl}/${connectionId}/accounts`;
+
+    console.log('🌐 [getAccounts] URL construída:', url);
+    console.log('🔑 [getAccounts] ConnectionId usado:', connectionId);
 
     return this.http.get<any>(url, this.getToken()).pipe(
       catchError((err) => {
-        console.error('Erro em getAccounts():', err);
+        console.error('❌ [getAccounts] Erro:', err);
+        console.error('📍 [getAccounts] URL que falhou:', url);
         return throwError(() => err);
       })
     );

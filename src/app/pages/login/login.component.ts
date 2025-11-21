@@ -46,8 +46,32 @@ export class LoginComponent {
       next: (res) => {
         if (res?.token) {
           this.auth.setToken(res.token);
-          this.auth.setCpf(cpf)
-          this.router.navigate(['/my-accounts']);
+          this.auth.setCpf(cpf);
+
+          // Buscar perfil do usuário e restaurar conexões
+          console.log('🔄 Carregando dados do usuário...');
+          this.auth.getUserProfile().subscribe({
+            next: () => {
+              console.log('✅ Perfil carregado');
+
+              // Depois buscar conexões ativas
+              this.auth.restoreActiveConnections().subscribe({
+                next: () => {
+                  console.log('✅ Conexões restauradas');
+                  this.router.navigate(['/dashboard']);
+                },
+                error: (err) => {
+                  console.warn('⚠️ Erro ao restaurar conexões (não crítico):', err);
+                  this.router.navigate(['/dashboard']);
+                }
+              });
+            },
+            error: (err) => {
+              console.warn('⚠️ Erro ao carregar perfil:', err);
+              // Continuar mesmo com erro
+              this.router.navigate(['/dashboard']);
+            }
+          });
         } else {
           this.errorMessage = 'Resposta inválida do servidor.';
         }

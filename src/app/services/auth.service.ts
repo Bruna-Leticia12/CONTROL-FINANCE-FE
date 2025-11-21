@@ -1,20 +1,32 @@
 import { Injectable } from '@angular/core';
 import { HttpClient, HttpErrorResponse } from '@angular/common/http';
 import { Observable, throwError } from 'rxjs';
-import { catchError } from 'rxjs/operators';
+import { catchError, tap, switchMap } from 'rxjs/operators';
 
 export interface LoginResponse {
   message: string;
   token: string;
 }
 
+export interface UserProfile {
+  _id: string;
+  name: string;
+  email: string;
+  cpf: string;
+  cellphoneNumber?: string;
+  createdAt: string;
+  updatedAt: string;
+}
+
 @Injectable({
   providedIn: 'root'
 })
 export class AuthService {
-  private baseUrl = 'http://localhost:2000/auth';
+  private baseUrl = 'http://localhost:4000/auth';
 
-  constructor(private http: HttpClient) {}
+  // Injeta ConnectionService, mas não podemos importar aqui para evitar dependência circular
+  // Vamos fazer a injeção manual depois
+  constructor(private http: HttpClient) { }
 
   register(payload: {
     name: string;
@@ -24,7 +36,7 @@ export class AuthService {
     password: string;
   }): Observable<any> {
     const url = `${this.baseUrl}/register`;
-    return this.http.post(url, payload).pipe(      
+    return this.http.post(url, payload).pipe(
       catchError(this.handleError)
     );
   }
@@ -45,16 +57,107 @@ export class AuthService {
   }
 
   logout() {
+    // Limpar apenas o token do localStorage
     localStorage.removeItem('ctrlf_token');
+
+    // Limpar sessionStorage (dados temporários da sessão)
+    // A CONEXÃO PERMANECE NO BANCO e será restaurada no próximo login
+    sessionStorage.clear();
+
+    console.log('🚪 Logout completo - sessão limpa');
+    console.log('ℹ️ Suas conexões bancárias foram preservadas e serão restauradas no próximo login');
   }
 
   isLoggedIn(): boolean {
-    return !!this.getToken();
+    const token = this.getToken();
+    if (!token) {
+      return false;
+    }
+
+    // Opcional: validar se o token não expirou (JWT decode)
+    // Por enquanto, apenas verifica se existe
+    return true;
   }
 
-  setCpf(cpf: string){
+  setCpf(cpf: string) {
     sessionStorage.setItem('cpf', cpf);
-  } 
+  }
+
+  /**
+   * Busca dados do perfil do usuário logado
+   */
+  getUserProfile(): Observable<UserProfile> {
+    const token = this.getToken();
+    if (!token) {
+      return throwError(() => new Error('No token available'));
+    }
+
+    const url = `${this.baseUrl}/profile`;
+    const headers = { Authorization: `Bearer ${token}` };
+
+    return this.http.get<UserProfile>(url, { headers }).pipe(
+      tap((user) => {
+        // Salvar nome do usuário no sessionStorage para usar no header
+        if (user.name) {
+          const firstName = user.name.split(' ')[0];
+          sessionStorage.setItem('userName', firstName);
+        }
+      }),
+      catchError(this.handleError)
+    );
+  }
+
+  /**
+   * Busca conexões ativas do usuário (deve ser chamado após login)
+   * Retorna Observable para permitir subscribe no componente
+   */
+  restoreActiveConnections(): Observable<any> {
+    const token = this.getToken();
+    if (!token) {
+      return throwError(() => new Error('No token available'));
+    }
+
+    const url = 'http://localhost:4000/connection/status?status=ACTIVE';
+    const headers = { Authorization: `Bearer ${token}` };
+
+    return this.http.get<any[]>(url, { headers }).pipe(
+      tap((connections) => {
+        console.log('🔗 Conexões ativas encontradas:', connections.length);
+
+        if (connections && connections.length > 0) {
+          const firstConnection = connections[0];
+          sessionStorage.setItem('connectionId', firstConnection._id);
+
+          // Descobrir qual banco baseado na targetApiUrl
+          const bankName = this.getBankNameFromUrl(firstConnection.targetApiUrl);
+          if (bankName) {
+            sessionStorage.setItem('connectedBank', bankName);
+          }
+
+          console.log('✅ ConnectionId restaurado:', firstConnection._id);
+          console.log('🏦 Banco conectado:', bankName);
+        } else {
+          console.log('ℹ️ Nenhuma conexão ativa encontrada');
+        }
+      }),
+      catchError((err) => {
+        console.error('❌ Erro ao restaurar conexões:', err);
+        return throwError(() => err);
+      })
+    );
+  }
+
+  private getBankNameFromUrl(targetApiUrl: string): string | null {
+    const urlMap: Record<string, string> = {
+      'http://localhost:4001': 'Bruna',
+      'http://localhost:4002': 'Guilherme',
+      'http://localhost:4003': 'Larissa',
+      'http://localhost:5000': 'Leonardo',
+      'http://localhost:4005': 'Rodrigo'
+    };
+
+    return urlMap[targetApiUrl] || null;
+  }
 
   private handleError(error: HttpErrorResponse) {
     let message = 'Ocorreu um erro inesperado.';

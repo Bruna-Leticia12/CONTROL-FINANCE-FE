@@ -1,20 +1,94 @@
-<div class="accounts-root">
-  <div class="card">
-    <h3>Minhas contas</h3>
+<div class="my-accounts-container">
+  <div class="page-header">
+    <h1 class="page-title">Minhas Contas Bancárias</h1>
+    <p class="page-subtitle">Gerencie suas conexões Open Finance</p>
+  </div>
 
-    <div class="accounts-grid">
-      @for (account of accounts; track account.name) {
-        <div
-          class="account-box"
-          [ngStyle]="{ 'background-color': account.color }"
-          (click)="openStartConnectionDialog(account.name)"
-        >
-          <div class="label">IF</div>
-          <div class="name">{{ account.name }}</div>
+  @if (loading) {
+  <div class="loading-state">
+    <div class="spinner"></div>
+    <p>Carregando informações...</p>
+  </div>
+  } @else {
+  <div class="banks-list">
+    @for (bankData of banksData; track bankData.bank.name) {
+    <div class="bank-card" [ngStyle]="{ '--bank-color': bankData.bank.color }">
+      <!-- Header do Banco -->
+      <div class="bank-header">
+        <div class="bank-info">
+          <div class="bank-icon" [ngStyle]="{ 'background-color': bankData.bank.color }">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <rect x="1" y="4" width="22" height="16" rx="2" ry="2" />
+              <line x1="1" y1="10" x2="23" y2="10" />
+            </svg>
+          </div>
+          <div class="bank-details">
+            <h3 class="bank-name">{{ bankData.bank.name }}</h3>
+            <span class="bank-status" [class.connected]="bankData.isConnected">
+              <span class="status-dot"></span>
+              {{ bankData.isConnected ? 'Conectado' : 'Desconectado' }}
+            </span>
+          </div>
         </div>
-      } @empty {
-        <p>Nenhuma conta encontrada.</p>
+
+        @if (!bankData.isConnected) {
+        <button class="connect-btn" (click)="openStartConnectionDialog(bankData.bank.name)">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71" />
+            <path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71" />
+          </svg>
+          Conectar
+        </button>
+        }
+      </div>
+
+      <!-- Contas do Banco (se conectado) -->
+      @if (bankData.isConnected) {
+      <div class="accounts-section">
+        @if (bankData.accounts && bankData.accounts.length > 0) {
+        <div class="accounts-list">
+          @for (account of bankData.accounts; track account._id) {
+          <div class="account-item">
+            <div class="account-icon">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <rect x="1" y="4" width="22" height="16" rx="2" ry="2" />
+                <line x1="1" y1="10" x2="23" y2="10" />
+              </svg>
+            </div>
+            <div class="account-info">
+              <div class="account-type">{{ getAccountTypeName(account.type) }}</div>
+              <div class="account-number">{{ account.number }}</div>
+              @if (account.branch) {
+              <div class="account-branch">Agência: {{ account.branch }}</div>
+              }
+            </div>
+          </div>
+          }
+        </div>
+        } @else if (bankData.error) {
+        <div class="error-message">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <circle cx="12" cy="12" r="10" />
+            <line x1="12" y1="8" x2="12" y2="12" />
+            <line x1="12" y1="16" x2="12.01" y2="16" />
+          </svg>
+          <span>Erro ao carregar contas</span>
+        </div>
+        } @else {
+        <div class="no-accounts">
+          <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+            <rect x="1" y="4" width="22" height="16" rx="2" ry="2" />
+            <line x1="1" y1="10" x2="23" y2="10" />
+          </svg>
+          <p>Nenhuma conta encontrada neste banco</p>
+        </div>
+        }
+      </div>
       }
     </div>
+    }
   </div>
+  }
 </div>
+
+<app-ai-agent></app-ai-agent>

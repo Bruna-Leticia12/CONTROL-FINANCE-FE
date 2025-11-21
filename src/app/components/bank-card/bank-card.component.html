@@ -1,0 +1,57 @@
+<div class="bank-card" [ngStyle]="{ '--card-color': account.color }">
+    <div class="card-inner">
+        <!-- Frente do cartão -->
+        <div class="card-front">
+            <div class="card-header">
+                <div class="card-chip"></div>
+                <div class="card-logo">
+                    <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <rect x="1" y="4" width="22" height="16" rx="2" ry="2" />
+                        <line x1="1" y1="10" x2="23" y2="10" />
+                    </svg>
+                </div>
+            </div>
+
+            <div class="card-content">
+                <div class="card-bank-name">{{ account.name }}</div>
+                <div class="card-number">•••• •••• •••• ••••</div>
+            </div>
+
+            <div class="card-footer">
+                <div class="card-status">
+                    <span class="status-indicator" [class.connected]="account.isConnected"></span>
+                    <span class="status-text">{{ getStatusText() }}</span>
+                </div>
+                @if (account.isConnected && account.lastSync) {
+                <div class="card-sync">
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <polyline points="23 4 23 10 17 10" />
+                        <path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10" />
+                    </svg>
+                    <span>{{ getLastSyncText() }}</span>
+                </div>
+                }
+            </div>
+        </div>
+
+        <!-- Botão de ação -->
+        <div class="card-action">
+            @if (!account.isConnected) {
+            <button class="connect-btn" (click)="onConnect()">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71" />
+                    <path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71" />
+                </svg>
+                <span>Conectar Open Finance</span>
+            </button>
+            } @else {
+            <button class="connected-btn" disabled>
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <polyline points="20 6 9 17 4 12" />
+                </svg>
+                <span>Conectado</span>
+            </button>
+            }
+        </div>
+    </div>
+</div>

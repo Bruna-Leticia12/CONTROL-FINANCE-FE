@@ -3,11 +3,12 @@ import { CommonModule } from '@angular/common';
 import { Transaction } from '../../../model/transaction.interface';
 import { TransactionService } from '../../services/transaction.service';
 import { Observable } from 'rxjs';
+import { AiAgentComponent } from '../../components/ai-agent/ai-agent.component';
 
 @Component({
   selector: 'app-transacoes',
   standalone: true,
-  imports: [CommonModule],
+  imports: [CommonModule, AiAgentComponent],
   templateUrl: './transacoes.component.html',
   styleUrls: ['./transacoes.component.scss']
 })

@@ -1,0 +1,43 @@
+<div class="carousel-container" (mouseenter)="onMouseEnter()" (mouseleave)="onMouseLeave()">
+    <div class="carousel-track" [style.transform]="'translateX(-' + (currentSlide * 100) + '%)'"
+        [style.transition]="'transform 0.6s cubic-bezier(0.4, 0, 0.2, 1)'">
+        @for (banner of banners; track $index) {
+        <div class="carousel-slide">
+            <div class="banner-overlay"></div>
+            <img [src]="banner.image" [alt]="banner.title || 'Banner'"
+                (error)="$any($event.target).src='assets/images/placeholder-banner.jpg'">
+            @if (banner.title || banner.subtitle) {
+            <div class="banner-content">
+                @if (banner.title) {
+                <h2 class="banner-title">{{ banner.title }}</h2>
+                }
+                @if (banner.subtitle) {
+                <p class="banner-subtitle">{{ banner.subtitle }}</p>
+                }
+            </div>
+            }
+        </div>
+        }
+    </div>
+
+    <!-- Navigation Arrows -->
+    <button class="carousel-btn prev" (click)="prevSlide()" aria-label="Anterior">
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <polyline points="15 18 9 12 15 6"></polyline>
+        </svg>
+    </button>
+    <button class="carousel-btn next" (click)="nextSlide()" aria-label="Próximo">
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <polyline points="9 18 15 12 9 6"></polyline>
+        </svg>
+    </button>
+
+    <!-- Indicators -->
+    <div class="carousel-indicators">
+        @for (banner of banners; track $index) {
+        <button class="indicator" [class.active]="currentSlide === $index" (click)="goToSlide($index)"
+            [attr.aria-label]="'Ir para slide ' + ($index + 1)">
+        </button>
+        }
+    </div>
+</div>

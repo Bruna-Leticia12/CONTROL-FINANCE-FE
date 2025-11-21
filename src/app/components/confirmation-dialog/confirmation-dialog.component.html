@@ -1,26 +1,38 @@
 <div class="dialog-container">
+  <div class="dialog-icon">
+    <svg width="64" height="64" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <path
+        d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"
+        fill="#4ad695" />
+    </svg>
+  </div>
+
+  <h2 class="dialog-title">Conectar com {{ bankName }}?</h2>
+
   <p class="dialog-message">
-    Ao continuar você permite o compartilhamento de dados via
-    <strong>Open Finance</strong>.
+    Ao continuar você autoriza o <strong>Control Finance</strong> a acessar seus dados financeiros via <strong>Open
+      Finance</strong>.
   </p>
 
-  <div class="input-container">
-    <input
-      type="password"
-      [(ngModel)]="password"
-      placeholder="Informe sua senha"
-      class="password-input"
-    />
+  <div class="permissions-list">
+    <p class="permissions-title">Dados que serão compartilhados:</p>
+    <ul>
+      <li>✓ Informações de contas bancárias</li>
+      <li>✓ Saldos e limites</li>
+      <li>✓ Histórico de transações</li>
+    </ul>
   </div>
 
   <div class="dialog-actions">
-    <button
-      class="btn-allow"
-      [disabled]="!password.trim()"
-      (click)="onAllow()"
-    >
-      Permitir
+    <button class="btn-confirm" (click)="onConfirm()">
+      Sim, conectar
     </button>
-    <button class="btn-deny" (click)="onDeny()">Não permitir</button>
+    <button class="btn-cancel" (click)="onCancel()">
+      Cancelar
+    </button>
   </div>
+
+  <p class="security-note">
+    🔒 Seus dados estão protegidos e criptografados
+  </p>
 </div>

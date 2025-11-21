@@ -18,13 +18,15 @@ import {
 } from 'chart.js';
 import { TransactionService } from '../../services/transaction.service';
 import { Transaction } from '../../../model/transaction.interface';
+import { AiAgentComponent } from '../../components/ai-agent/ai-agent.component';
+
 
 Chart.register(PieController, DoughnutController, ArcElement, Tooltip, Legend);
 
 @Component({
   selector: 'app-metas',
   standalone: true,
-  imports: [CommonModule],
+  imports: [CommonModule, AiAgentComponent],
   templateUrl: './metas.component.html',
   styleUrls: ['./metas.component.scss'],
 })
