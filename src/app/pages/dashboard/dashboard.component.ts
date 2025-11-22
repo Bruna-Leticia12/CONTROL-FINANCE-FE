@@ -40,11 +40,12 @@ Chart.register(ArcElement, Tooltip, Legend);
   styleUrls: ['./dashboard.component.scss'],
 })
 export class DashboardComponent implements OnInit, AfterViewInit, OnDestroy {
-  @ViewChild('incomeCanvas') incomeCanvas!: ElementRef<HTMLCanvasElement>;
-  @ViewChild('fixedCanvas') fixedCanvas!: ElementRef<HTMLCanvasElement>;
-  @ViewChild('saveCanvas') saveCanvas!: ElementRef<HTMLCanvasElement>;
-  @ViewChild('leisureCanvas') leisureCanvas!: ElementRef<HTMLCanvasElement>;
-  @ViewChild('unexpectedCanvas') unexpectedCanvas!: ElementRef<HTMLCanvasElement>;
+  @ViewChild('incomeCanvas', { static: false }) incomeCanvas!: ElementRef<HTMLCanvasElement>;
+  @ViewChild('fixedCanvas', { static: false }) fixedCanvas!: ElementRef<HTMLCanvasElement>;
+  @ViewChild('saveCanvas', { static: false }) saveCanvas!: ElementRef<HTMLCanvasElement>;
+  @ViewChild('leisureCanvas', { static: false }) leisureCanvas!: ElementRef<HTMLCanvasElement>;
+  @ViewChild('unexpectedCanvas', { static: false }) unexpectedCanvas!: ElementRef<HTMLCanvasElement>;
+
 
   private destroy$ = new Subject<void>();
   private charts: Chart[] = [];
@@ -138,7 +139,10 @@ export class DashboardComponent implements OnInit, AfterViewInit, OnDestroy {
             console.log('Calculando categorias e renderizando gráficos...');
             this.data = this.transactionService.getCategorySums(this.transactions);
             this.calculateFinancialSummary();
-            this.renderCharts();
+            
+            setTimeout(() => {
+              this.renderCharts();
+            });
           } else {
             console.log('Nenhuma transação encontrada - gráficos não serão renderizados');
           }

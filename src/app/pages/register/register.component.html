@@ -8,12 +8,12 @@
       (error)="onImageError($event)"
     />
 
-    <h2 class="subtitle">Create account</h2>
+    <h2 class="subtitle">Criar uma conta</h2>
 
     <form [formGroup]="registerForm" (ngSubmit)="onSubmit()">
 
       <div class="input-row">
-        <input type="text" formControlName="name" placeholder="Name">
+        <input type="text" formControlName="name" placeholder="Nome">
       </div>
 
       <div class="input-row">
@@ -25,30 +25,30 @@
       </div>
 
       <div class="input-row">
-        <input type="text" formControlName="cellphoneNumber" placeholder="Phone number">
+        <input type="text" formControlName="cellphoneNumber" placeholder="Telefone">
       </div>
 
       <div class="input-row">
-        <input type="password" formControlName="password" placeholder="Password">
+        <input type="password" formControlName="password" placeholder="Senha">
       </div>
 
       <div class="input-row">
-        <input type="password" formControlName="confirmPassword" placeholder="Confirm password">
+        <input type="password" formControlName="confirmPassword" placeholder="Confirmar senha">
       </div>
 
       <label class="terms-checkbox">
         <input type="checkbox" formControlName="terms" />
-        <span>I accept the <a href="#">Terms and Conditions</a></span>
+        <span>Aceito os <a href="#">Termos e Condições</a></span>
       </label>
 
       <button type="submit" class="register-btn" [disabled]="!registerForm.valid || loading">
-        {{ loading ? 'REGISTERING...' : 'REGISTER' }}
+        {{ loading ? 'CADASTRANDO...' : 'CADASTRAR' }}
       </button>
 
     </form>
 
     <p class="login-text">
-      Already have an account? <a routerLink="/login">Log in</a>
+      Já tem uma conta? <a routerLink="/login">Login</a>
     </p>
 
   </div>

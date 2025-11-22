@@ -1,10 +1,8 @@
-<!-- Banner Carousel (Full Width) -->
-<div class="carousel-wrapper">
-  <app-banner-carousel></app-banner-carousel>
-</div>
-
 <!-- Dashboard Content -->
 <div class="dashboard-container">
+  <div class="section-header">
+    <h3 class="section-title-small">Balanço de Gastos</h3>
+  </div>
   <!-- Grid Principal: Saldos + Gráficos -->
   <div class="main-content">
     <div class="main-grid">
@@ -53,9 +51,6 @@
 
       <!-- Coluna Direita: Gráficos -->
       <section class="charts-section">
-        <div class="section-header">
-          <h3 class="section-title-small">Balanço de Gastos</h3>
-        </div>
 
         @if (hasTransactions) {
         <div class="charts-grid">
@@ -143,6 +138,11 @@
       </div>
     </section>
   </div>
+</div>
+
+<!-- Banner Carousel (Full Width) -->
+<div class="carousel-wrapper">
+  <app-banner-carousel></app-banner-carousel>
 </div>
 
 <app-ai-agent></app-ai-agent>
