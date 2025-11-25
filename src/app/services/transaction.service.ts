@@ -150,7 +150,7 @@ export class TransactionService {
    * Pode ser usado em Dashboard, Metas e outras telas
    */
   getCategorySums(transactions: any[]) {
-    const rendaDesc = ['Salario'];
+    const rendaDesc = ['Salario', 'Salário'];
     const despesaFixaDesc = [
       'Financiamento', 'Aluguel', 'Água', 'Luz', 'Internet',
       'Mercado', 'Transporte', 'Plano de Saúde', 'Medicamento',
@@ -160,7 +160,7 @@ export class TransactionService {
     const lazerDesc = ['Viagem', 'Evento', 'Hobby', 'Restaurante', 'Pessoal'];
     const imprevistosDesc = ['Manutenção', 'Conserto', 'Multa', 'Taxa', 'Jogos', 'Apostas'];
 
-    const sums = {
+    const sums = {  
       renda: 0,
       despesasFixas: 0,
       poupar: 0,

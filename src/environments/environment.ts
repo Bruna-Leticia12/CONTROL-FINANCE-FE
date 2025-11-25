@@ -5,7 +5,7 @@ export const environment = {
     bruna: 'http://localhost:4001',
     guilherme: 'http://localhost:4002',
     larissa: 'http://localhost:4003',
-    leonardo: 'http://localhost:5000',
+    leonardo: 'http://localhost:4004',
     rodrigo: 'http://localhost:4005',
   }
 };

@@ -21,6 +21,7 @@ import { BankCardComponent, BankAccount } from '../../components/bank-card/bank-
 import { EmptyStateComponent } from '../../components/empty-state/empty-state.component';
 import { ConfirmationDialogComponent } from '../../components/confirmation-dialog/confirmation-dialog.component';
 import { BannerCarouselComponent } from '../../components/banner-carousel/banner-carousel.component';
+import { isArray } from 'chart.js/helpers';
 
 Chart.register(ArcElement, Tooltip, Legend);
 
@@ -130,11 +131,10 @@ export class DashboardComponent implements OnInit, AfterViewInit, OnDestroy {
         finalize(() => console.log('Transações carregadas'))
       )
       .subscribe({
-        next: (data) => {
-          console.log('Transações recebidas:', data?.length || 0);
-          // Extrair apenas as transações dos metadados
-          this.transactions = data.map(item => item.transaction) || [];
-          this.hasTransactions = this.transactions.length > 0;
+        next: (data: any) => {
+          console.log('Transações recebidas:', data?.length || data?.transactions.length > 0 || 0);
+          this.transactions = isArray(data) ? data : data.transactions || [];
+          this.hasTransactions = this.transactions.length > 0
 
           if (this.hasTransactions) {
             console.log('Calculando categorias e renderizando gráficos...');
