@@ -24,6 +24,21 @@ export class TransactionService {
   ) { }
 
   /**
+   * Busca dados analíticos agregados por categoria (endpoint otimizado)
+   */
+  getAnalytics(): Observable<any> {
+    const url = `${environment.controlFinanceBackendUrl}/analytics/categories/me`;
+    console.log('📊 [TransactionService] Buscando analytics:', url);
+
+    return this.http.get<any>(url).pipe(
+      catchError((error) => {
+        console.error('❌ [TransactionService] Erro ao buscar analytics:', error);
+        return of(null);
+      })
+    );
+  }
+
+  /**
    * Busca TODAS as transações de TODAS as contas de TODAS as conexões ativas
    */
   loadAllTransactions(): Observable<TransactionWithMetadata[]> {
@@ -160,7 +175,7 @@ export class TransactionService {
     const lazerDesc = ['Viagem', 'Evento', 'Hobby', 'Restaurante', 'Pessoal'];
     const imprevistosDesc = ['Manutenção', 'Conserto', 'Multa', 'Taxa', 'Jogos', 'Apostas'];
 
-    const sums = {  
+    const sums = {
       renda: 0,
       despesasFixas: 0,
       poupar: 0,

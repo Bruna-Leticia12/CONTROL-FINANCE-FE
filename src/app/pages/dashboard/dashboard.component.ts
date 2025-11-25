@@ -21,7 +21,6 @@ import { BankCardComponent, BankAccount } from '../../components/bank-card/bank-
 import { EmptyStateComponent } from '../../components/empty-state/empty-state.component';
 import { ConfirmationDialogComponent } from '../../components/confirmation-dialog/confirmation-dialog.component';
 import { BannerCarouselComponent } from '../../components/banner-carousel/banner-carousel.component';
-import { isArray } from 'chart.js/helpers';
 
 Chart.register(ArcElement, Tooltip, Legend);
 
@@ -125,35 +124,59 @@ export class DashboardComponent implements OnInit, AfterViewInit, OnDestroy {
   }
 
   loadTransactions(): void {
-    this.transactionService.loadAllTransactions()
+    this.transactionService.getAnalytics()
       .pipe(
         takeUntil(this.destroy$),
-        finalize(() => console.log('Transações carregadas'))
+        finalize(() => console.log('Analytics carregados'))
       )
       .subscribe({
-        next: (data: any) => {
-          console.log('Transações recebidas:', data?.length || data?.transactions.length > 0 || 0);
-          this.transactions = isArray(data) ? data : data.transactions || [];
-          this.hasTransactions = this.transactions.length > 0
+        next: (analyticsData: any) => {
+          console.log('📊 Analytics recebidos:', analyticsData);
 
-          if (this.hasTransactions) {
-            console.log('Calculando categorias e renderizando gráficos...');
-            this.data = this.transactionService.getCategorySums(this.transactions);
-            this.calculateFinancialSummary();
-            
-            setTimeout(() => {
-              this.renderCharts();
-            });
-          } else {
-            console.log('Nenhuma transação encontrada - gráficos não serão renderizados');
+          if (!analyticsData || !analyticsData.categories) {
+            console.warn('⚠️ Nenhum dado analítico encontrado');
+            this.hasTransactions = false;
+            return;
           }
+
+          const categories = analyticsData.categories;
+          this.hasTransactions = true;
+
+          // Mapear categorias do backend para o formato do frontend
+          const rendaTotal = Math.abs(categories['Renda'] || 0);
+          const despesasFixasTotal = Math.abs(categories['Despesa Fixa'] || 0);
+          const pouparTotal = Math.abs(categories['Poupar'] || 0);
+          const lazerTotal = Math.abs(categories['Lazer'] || 0);
+          const imprevistosTotal = Math.abs(categories['Imprevistos'] || 0);
+
+          // Calcular expected com base na renda (50-30-20 ajustado)
+          const expected = {
+            despesasFixas: (rendaTotal * 60) / 100,
+            poupar: (rendaTotal * 20) / 100,
+            lazer: (rendaTotal * 15) / 100,
+            imprevistos: (rendaTotal * 5) / 100,
+          };
+
+          this.data = {
+            renda: { value: rendaTotal, expected: rendaTotal },
+            despesasFixas: { value: despesasFixasTotal, expected: expected.despesasFixas },
+            poupar: { value: pouparTotal, expected: expected.poupar },
+            lazer: { value: lazerTotal, expected: expected.lazer },
+            imprevistos: { value: imprevistosTotal, expected: expected.imprevistos },
+          };
+
+          console.log('💰 Dados processados:', this.data);
+          this.calculateFinancialSummary();
+
+          setTimeout(() => {
+            this.renderCharts();
+          });
         },
         error: (err: any) => {
-          console.error('Erro ao carregar transações:', err);
-          this.transactions = [];
+          console.error('❌ Erro ao carregar analytics:', err);
           this.hasTransactions = false;
         },
-        complete: () => console.log('Observable de transações completo')
+        complete: () => console.log('✅ Observable de analytics completo')
       });
   }
 
