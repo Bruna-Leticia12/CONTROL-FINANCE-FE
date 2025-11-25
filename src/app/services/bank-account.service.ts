@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { HttpClient, HttpHeaders } from '@angular/common/http';
+import { HttpClient } from '@angular/common/http';
 import { Observable, forkJoin, of } from 'rxjs';
 import { map, catchError } from 'rxjs';
 import { environment } from '../../environments/environment';
@@ -38,11 +38,6 @@ export class BankAccountService {
         return this.banks;
     }
 
-    private getToken() {
-        const token = localStorage.getItem('ctrlf_token');
-        return { headers: new HttpHeaders({ Authorization: `Bearer ${token}` }) };
-    }
-
     /**
      * Verifica se há conexão ativa com algum banco
      */
@@ -56,7 +51,7 @@ export class BankAccountService {
      */
     getConnectedBankAccounts(connectionId: string): Observable<any> {
         const url = `${this.baseUrl}/${connectionId}/accounts`;
-        return this.http.get<any>(url, this.getToken()).pipe(
+        return this.http.get<any>(url).pipe(
             catchError((err) => {
                 console.error('Erro ao buscar contas:', err);
                 return of({ error: err.message });

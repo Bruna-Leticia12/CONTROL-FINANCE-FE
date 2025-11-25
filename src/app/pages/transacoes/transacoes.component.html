@@ -1,50 +1,121 @@
-<div class="transactions-root card" *ngIf="!loading && !error">
-  <h3>Extrato de Transações</h3>
+<div class="transactions-container">
+  <!-- Loading State -->
+  @if (loading) {
+    <div class="loading-state card">
+      <div class="spinner"></div>
+      <p>Carregando transações de todas as suas contas...</p>
+    </div>
+  }
 
-  @if (transactions.length > 0) {
-    <table class="transactions-table">
-      <thead>
-        <tr>
-          <th>Data</th>
-          <th>Descrição</th>
-          <th class="right">Valor</th>
-        </tr>
-      </thead>
-      <tbody>
-        @for (t of transactions; track t._id) {
-          <tr>
-            <td>{{ t.date | date:'dd/MM/yyyy' }}</td>
-            <td>{{ t.description }}</td>
-            <td
-              class="right"
-              [class.debit]="t.type === 'debit'"
-              [class.credit]="t.type === 'credit'"
-            >
-              {{ formatAmount(t) }}
-            </td>
-          </tr>
-        }
-      </tbody>
-      <tfoot>
-        <tr class="balance-row">
-          <td colspan="2">Saldo</td>
-          <td class="right total">
-            R$ {{ balance.toFixed(2).replace('.', ',') }}
-          </td>
-        </tr>
-      </tfoot>
-    </table>
-  } @else {
-    <div class="empty-state">Nenhuma transação encontrada.</div>
+  <!-- Error State -->
+  @if (error && !loading) {
+    <div class="error-state card">
+      <p>❌ Erro ao carregar transações. Tente novamente mais tarde.</p>
+    </div>
+  }
+
+  <!-- Summary Cards -->
+  @if (!loading && !error && allTransactions.length > 0) {
+    <div class="summary-cards">
+      <div class="summary-card balance">
+        <h3>Saldo Total</h3>
+        <p class="amount" [class.positive]="totalBalance >= 0" [class.negative]="totalBalance < 0">
+          R$ {{ totalBalance.toFixed(2).replace('.', ',') }}
+        </p>
+      </div>
+      <div class="summary-card credit">
+        <h3>Total Recebido</h3>
+        <p class="amount positive">+ R$ {{ totalCredit.toFixed(2).replace('.', ',') }}</p>
+      </div>
+      <div class="summary-card debit">
+        <h3>Total Gasto</h3>
+        <p class="amount negative">- R$ {{ totalDebit.toFixed(2).replace('.', ',') }}</p>
+      </div>
+    </div>
+
+    <!-- Transactions by Bank -->
+    <div class="banks-container">
+      @for (bank of groupedByBank; track bank.bankName) {
+        <div class="bank-section card" [class.collapsed]="!bank.isExpanded">
+          <div class="bank-header" (click)="toggleBank(bank)">
+            <div class="bank-header-left">
+              <span class="toggle-icon" [class.expanded]="bank.isExpanded">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <polyline points="6 9 12 15 18 9"></polyline>
+                </svg>
+              </span>
+              <h2>🏦 {{ bank.bankName }}</h2>
+            </div>
+            <span class="bank-balance" [class.positive]="bank.totalBalance >= 0" [class.negative]="bank.totalBalance < 0">
+              Saldo: R$ {{ bank.totalBalance.toFixed(2).replace('.', ',') }}
+            </span>
+          </div>
+
+          <!-- Accounts within this bank (only show if expanded) -->
+          <div class="bank-content" [class.collapsed]="!bank.isExpanded">
+            @if (bank.isExpanded) {
+              @for (account of bank.accounts; track account.accountId) {
+                <div class="account-section">
+                  <div class="account-header">
+                    <h3>💳 Conta: {{ account.accountNumber }}</h3>
+                    <div class="account-stats">
+                      <span class="stat credit">↑ R$ {{ account.totalCredit.toFixed(2).replace('.', ',') }}</span>
+                      <span class="stat debit">↓ R$ {{ account.totalDebit.toFixed(2).replace('.', ',') }}</span>
+                      <span class="stat balance" [class.positive]="account.balance >= 0" [class.negative]="account.balance < 0">
+                        = R$ {{ account.balance.toFixed(2).replace('.', ',') }}
+                      </span>
+                    </div>
+                  </div>
+
+                  <!-- Transactions table -->
+                  <div class="transactions-table-wrapper">
+                    <table class="transactions-table">
+                      <thead>
+                        <tr>
+                          <th>Data</th>
+                          <th>Descrição</th>
+                          <th>Categoria</th>
+                          <th>Tipo</th>
+                          <th class="right">Valor</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        @for (item of account.transactions; track item.transaction._id) {
+                          <tr>
+                            <td>{{ formatDate(item.transaction.createdAt) }}</td>
+                            <td>{{ item.transaction.description }}</td>
+                            <td><span class="category-badge">{{ item.transaction.category }}</span></td>
+                            <td>
+                              <span class="type-badge" [class.credit]="item.transaction.type === 'credit'" [class.debit]="item.transaction.type === 'debit'">
+                                {{ item.transaction.type === 'credit' ? 'Crédito' : 'Débito' }}
+                              </span>
+                            </td>
+                            <td class="right" 
+                                [class.text-green]="item.transaction.type === 'credit'" 
+                                [class.text-red]="item.transaction.type === 'debit'">
+                              {{ formatAmount(item.transaction.amount, item.transaction.type) }}
+                            </td>
+                          </tr>
+                        }
+                      </tbody>
+                    </table>
+                  </div>
+                </div>
+              }
+            }
+          </div>
+        </div>
+      }
+    </div>
+  }
+
+  <!-- Empty State -->
+  @if (!loading && !error && allTransactions.length === 0) {
+    <div class="empty-state card">
+      <h2>📭 Nenhuma transação encontrada</h2>
+      <p>Conecte-se a um banco para visualizar suas transações.</p>
+    </div>
   }
 </div>
-
-@if (loading) {
-  <div class="loading-state">Carregando extrato...</div>
-}
-
-@if (error) {
-  <div class="error-state">{{ error }}</div>
-}
 
 <app-ai-agent></app-ai-agent>

@@ -1,19 +1,12 @@
 import { bootstrapApplication } from '@angular/platform-browser';
-import { provideRouter } from '@angular/router';
-import { provideHttpClient } from '@angular/common/http';
-import { HTTP_INTERCEPTORS } from '@angular/common/http';
 import { AppComponent } from './app/app.component';
-import { routes } from './app/app.routes';
-import { AuthInterceptor } from './app/interceptors/auth.interceptor';
+import { appConfig } from './app/app.config';
 
-bootstrapApplication(AppComponent, {
-  providers: [
-    provideRouter(routes),
-    provideHttpClient(),
-    {
-      provide: HTTP_INTERCEPTORS,
-      useClass: AuthInterceptor,
-      multi: true
-    }
-  ]
-}).catch(err => console.error(err));
+console.log('🚀 Iniciando aplicação...');
+
+bootstrapApplication(AppComponent, appConfig)
+  .then(() => console.log('✅ Aplicação iniciada com sucesso!'))
+  .catch(err => {
+    console.error('❌ Erro ao iniciar aplicação:', err);
+    console.error('Stack:', err.stack);
+  });

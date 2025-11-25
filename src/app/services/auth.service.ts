@@ -49,11 +49,15 @@ export class AuthService {
   }
 
   setToken(token: string) {
+    console.log('💾 [AuthService] Salvando token:', token.substring(0, 20) + '...');
     localStorage.setItem('ctrlf_token', token);
+    console.log('✅ [AuthService] Token salvo com sucesso');
   }
 
   getToken(): string | null {
-    return localStorage.getItem('ctrlf_token');
+    const token = localStorage.getItem('ctrlf_token');
+    console.log('🔍 [AuthService] Buscando token. Encontrado?', !!token);
+    return token;
   }
 
   logout() {
@@ -74,9 +78,66 @@ export class AuthService {
       return false;
     }
 
-    // Opcional: validar se o token não expirou (JWT decode)
-    // Por enquanto, apenas verifica se existe
-    return true;
+    // Validar se o token não expirou
+    return !this.isTokenExpired(token);
+  }
+
+  /**
+   * Verifica se o token JWT está expirado
+   */
+  isTokenExpired(token: string): boolean {
+    try {
+      const payload = this.decodeToken(token);
+      if (!payload.exp) {
+        return false; // Se não tem exp, considerar válido
+      }
+
+      const now = Math.floor(Date.now() / 1000);
+      const isExpired = payload.exp < now;
+
+      if (isExpired) {
+        console.warn('⏰ [AuthService] Token expirado em:', new Date(payload.exp * 1000));
+      }
+
+      return isExpired;
+    } catch (error) {
+      console.error('❌ [AuthService] Erro ao verificar expiração do token:', error);
+      return true; // Se não conseguir decodificar, considerar expirado por segurança
+    }
+  }
+
+  /**
+   * Decodifica o payload do token JWT
+   */
+  decodeToken(token: string): any {
+    try {
+      const parts = token.split('.');
+      if (parts.length !== 3) {
+        throw new Error('Token JWT inválido');
+      }
+
+      const payload = parts[1];
+      const decoded = atob(payload);
+      return JSON.parse(decoded);
+    } catch (error) {
+      throw new Error('Erro ao decodificar token JWT');
+    }
+  }
+
+  /**
+   * Obtém informações do token sem fazer requisição ao servidor
+   */
+  getTokenInfo(): any {
+    const token = this.getToken();
+    if (!token) {
+      return null;
+    }
+
+    try {
+      return this.decodeToken(token);
+    } catch (error) {
+      return null;
+    }
   }
 
   setCpf(cpf: string) {

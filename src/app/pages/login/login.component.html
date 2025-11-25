@@ -10,6 +10,19 @@
 
     <h2 class="subtitle">Faça o login para continuar</h2>
 
+    <!-- Session Expired Alert -->
+    @if (sessionExpiredMessage) {
+      <div class="alert alert-warning">
+        {{ sessionExpiredMessage }}
+      </div>
+    }
+
+    <!-- Error Message -->
+    @if (errorMessage) {
+      <div class="alert alert-error">
+        {{ errorMessage }}
+      </div>
+    }
 
     <form [formGroup]="loginForm" (ngSubmit)="onSubmit()">
       <div class="input-row">
