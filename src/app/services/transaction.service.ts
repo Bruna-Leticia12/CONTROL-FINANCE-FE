@@ -1,7 +1,16 @@
 import { Injectable } from '@angular/core';
 import { environment } from '../../environments/environment';
-import { catchError, Observable, of, switchMap, throwError } from 'rxjs';
-import { HttpClient, HttpHeaders } from '@angular/common/http';
+import { catchError, forkJoin, map, Observable, of, switchMap } from 'rxjs';
+import { HttpClient } from '@angular/common/http';
+import { ConnectionService } from './connection.service';
+
+export interface TransactionWithMetadata {
+  transaction: any;
+  accountId: string;
+  accountNumber: string;
+  bankName: string;
+  connectionId: string;
+}
 
 @Injectable({
   providedIn: 'root',
@@ -9,60 +18,131 @@ import { HttpClient, HttpHeaders } from '@angular/common/http';
 export class TransactionService {
   private baseUrl = environment.controlFinanceBackendUrl + '/open-finance';
 
-  constructor(private http: HttpClient) { }
+  constructor(
+    private http: HttpClient,
+    private connectionService: ConnectionService
+  ) { }
 
-  getToken() {
-    const token = localStorage.getItem('ctrlf_token');
-    return { headers: new HttpHeaders({ Authorization: `Bearer ${token}` }) };
-  }
+  /**
+   * Busca TODAS as transações de TODAS as contas de TODAS as conexões ativas
+   */
+  loadAllTransactions(): Observable<TransactionWithMetadata[]> {
+    console.log('🔍 [TransactionService] Iniciando busca de todas as transações...');
+    console.log('🔑 [TransactionService] Token presente?', !!localStorage.getItem('ctrlf_token'));
 
-  loadTransactions(): Observable<any> {
-    const connectionId = sessionStorage.getItem('connectionId');
+    return this.connectionService.getActiveConnections().pipe(
+      switchMap((connections) => {
+        console.log('� [TransactionService] Conexões ativas:', connections.length);
 
-    console.log('🔍 [TransactionService] Verificando connectionId:', connectionId);
-    console.log('📦 [TransactionService] SessionStorage completo:', {
-      connectionId: sessionStorage.getItem('connectionId'),
-      customerId: sessionStorage.getItem('customerId'),
-      connectedBank: sessionStorage.getItem('connectedBank'),
-      cpf: sessionStorage.getItem('cpf')
-    });
+        if (!connections || connections.length === 0) {
+          console.warn('⚠️ Nenhuma conexão ativa encontrada');
+          return of([]);
+        }
 
-    // Se não houver connectionId, retornar array vazio ao invés de fazer requisição
-    if (!connectionId || connectionId === 'null') {
-      console.warn('⚠️ Nenhuma conexão ativa - retornando array vazio');
-      return of([]);
-    }
+        // Para cada conexão, buscar contas e transações
+        const allRequests = connections.map((connection) =>
+          this.loadTransactionsForConnection(connection._id, connection.targetApiUrl)
+        );
 
-    console.log('✅ ConnectionId válido, buscando accounts...');
-
-    return this.getAccounts().pipe(
-      switchMap((res: any) => this.getTransactions(res))
-    );
-  }
-
-  private getTransactions(res: any) {
-    return this.http
-      .get<any>(
-        `${this.baseUrl}/${sessionStorage.getItem('connectionId')}/accounts/${res[0]._id}/transactions`,
-        this.getToken()
-      )
-      .pipe(catchError((err) => err));
-  }
-
-  private getAccounts() {
-    const connectionId = sessionStorage.getItem('connectionId');
-    const url = `${this.baseUrl}/${connectionId}/accounts`;
-
-    console.log('🌐 [getAccounts] URL construída:', url);
-    console.log('🔑 [getAccounts] ConnectionId usado:', connectionId);
-
-    return this.http.get<any>(url, this.getToken()).pipe(
-      catchError((err) => {
-        console.error('❌ [getAccounts] Erro:', err);
-        console.error('📍 [getAccounts] URL que falhou:', url);
-        return throwError(() => err);
+        // Executar todas as requisições em paralelo e combinar resultados
+        return forkJoin(allRequests).pipe(
+          map((results) => results.flat())
+        );
+      }),
+      catchError((error) => {
+        console.error('❌ [TransactionService] Erro ao carregar transações:', error);
+        return of([]);
       })
     );
+  }
+
+  /**
+   * Busca transações de uma conexão específica
+   */
+  private loadTransactionsForConnection(
+    connectionId: string,
+    targetApiUrl: string
+  ): Observable<TransactionWithMetadata[]> {
+    const url = `${this.baseUrl}/${connectionId}/accounts`;
+    console.log('🌐 [loadTransactionsForConnection] Buscando contas de:', connectionId);
+
+    return this.http.get<any[]>(url).pipe(
+      switchMap((accounts) => {
+        console.log(`📊 [loadTransactionsForConnection] ${accounts.length} conta(s) encontrada(s)`);
+
+        if (!accounts || accounts.length === 0) {
+          return of([]);
+        }
+
+        // Para cada conta, buscar transações
+        const transactionRequests = accounts.map((account) =>
+          this.loadTransactionsForAccount(connectionId, account, targetApiUrl)
+        );
+
+        return forkJoin(transactionRequests).pipe(
+          map((results) => results.flat())
+        );
+      }),
+      catchError((error) => {
+        console.error(`❌ Erro ao buscar contas da conexão ${connectionId}:`, error);
+        return of([]);
+      })
+    );
+  }
+
+  /**
+   * Busca transações de uma conta específica
+   */
+  private loadTransactionsForAccount(
+    connectionId: string,
+    account: any,
+    bankUrl: string
+  ): Observable<TransactionWithMetadata[]> {
+    const accountId = account.accountId || account._id || account.id;
+    const url = `${this.baseUrl}/${connectionId}/accounts/${accountId}/transactions`;
+
+    console.log(`💰 [loadTransactionsForAccount] Buscando transações da conta ${accountId}`);
+
+    return this.http.get<any>(url).pipe(
+      map((response) => {
+        const transactions = response.transactions || response || [];
+        console.log(`✅ ${transactions.length} transação(ões) encontrada(s) na conta ${accountId}`);
+
+        // Adicionar metadados a cada transação
+        return transactions.map((transaction: any) => ({
+          transaction,
+          accountId,
+          accountNumber: account.accountNumber || account.number || 'N/A',
+          bankName: this.getBankNameFromUrl(bankUrl),
+          connectionId
+        }));
+      }),
+      catchError((error) => {
+        console.error(`❌ Erro ao buscar transações da conta ${accountId}:`, error);
+        return of([]);
+      })
+    );
+  }
+
+  /**
+   * Extrai o nome do banco da URL
+   */
+  private getBankNameFromUrl(url: string): string {
+    const bankNames: Record<string, string> = {
+      '4001': 'Banco Bruna',
+      '4002': 'Banco Guilherme',
+      '4003': 'Banco Larissa',
+      '5000': 'Banco Leonardo',
+      '4005': 'Banco Rodrigo'
+    };
+
+    for (const [port, name] of Object.entries(bankNames)) {
+      if (url.includes(port)) {
+        return name;
+      }
+    }
+
+    return 'Banco Desconhecido';
   }
 
   /**

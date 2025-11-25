@@ -1,7 +1,7 @@
-import { Component } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { CommonModule } from '@angular/common';
-import { Router, RouterModule } from '@angular/router';
+import { Router, RouterModule, ActivatedRoute } from '@angular/router';
 import { AuthService } from '../../services/auth.service';
 import { finalize } from 'rxjs/operators';
 
@@ -12,15 +12,36 @@ import { finalize } from 'rxjs/operators';
   templateUrl: './login.component.html',
   styleUrls: ['./login.component.scss']
 })
-export class LoginComponent {
+export class LoginComponent implements OnInit {
   loginForm: FormGroup;
   loading = false;
   errorMessage: string | null = null;
+  sessionExpiredMessage: string | null = null;
 
-  constructor(private fb: FormBuilder, private router: Router, private auth: AuthService) {
+  constructor(
+    private fb: FormBuilder, 
+    private router: Router, 
+    private route: ActivatedRoute,
+    private auth: AuthService
+  ) {
     this.loginForm = this.fb.group({
       cpf: ['', Validators.required],
       password: ['', Validators.required]
+    });
+  }
+
+  ngOnInit(): void {
+    // Verificar se foi redirecionado por token expirado
+    this.route.queryParams.subscribe(params => {
+      if (params['expired'] === 'true') {
+        this.sessionExpiredMessage = '⏰ Sua sessão expirou. Por favor, faça login novamente.';
+        console.warn('🔒 Usuário redirecionado por sessão expirada');
+        
+        // Limpar mensagem após 5 segundos
+        setTimeout(() => {
+          this.sessionExpiredMessage = null;
+        }, 5000);
+      }
     });
   }
 

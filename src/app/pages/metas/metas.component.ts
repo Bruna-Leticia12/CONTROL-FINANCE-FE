@@ -60,8 +60,10 @@ export class MetasComponent implements AfterViewInit, OnDestroy {
   }
 
   private loadData(): void {
-    this.transactionService.loadTransactions().subscribe({
-      next: (transactions: Transaction[]) => {
+    this.transactionService.loadAllTransactions().subscribe({
+      next: (data) => {
+        // Extrair apenas as transações dos metadados
+        const transactions = data.map(item => item.transaction);
         const categoryData = this.transactionService.getCategorySums(transactions);
         this.renda = categoryData.renda.value;
 
@@ -97,7 +99,7 @@ export class MetasComponent implements AfterViewInit, OnDestroy {
         this.createMainPieChart();
         this.gerarAlertas();
       },
-      error: (err) => console.error('Erro ao carregar transações', err),
+      error: (err: any) => console.error('Erro ao carregar transações', err),
     });
   }
 
@@ -230,16 +232,41 @@ export class MetasComponent implements AfterViewInit, OnDestroy {
           {
             data: dataValues,
             backgroundColor: dataColors,
-            borderWidth: 0,
+            borderWidth: 3,
+            borderColor: '#ffffff',
+            hoverBorderWidth: 4,
+            hoverBorderColor: '#ffffff',
           },
         ],
       },
       options: {
         responsive: true,
         maintainAspectRatio: false,
-        animation: { duration: 600 },
+        animation: { 
+          duration: 800,
+          easing: 'easeInOutQuart'
+        },
         layout: { padding: 10 },
-        plugins: { legend: { display: false }, tooltip: { enabled: true } },
+        plugins: { 
+          legend: { display: false }, 
+          tooltip: { 
+            enabled: true,
+            backgroundColor: 'rgba(0, 0, 0, 0.8)',
+            titleColor: '#ffffff',
+            bodyColor: '#ffffff',
+            borderColor: '#ffffff',
+            borderWidth: 1,
+            padding: 12,
+            displayColors: true,
+            callbacks: {
+              label: function(context) {
+                const label = context.label || '';
+                const value = context.parsed || 0;
+                return `${label}: ${value}%`;
+              }
+            }
+          } 
+        },
       },
       plugins: [textInsidePlugin],
     });
@@ -264,15 +291,26 @@ export class MetasComponent implements AfterViewInit, OnDestroy {
       type: 'doughnut',
       data: {
         datasets: [
-          { data: dataParts, backgroundColor: colors, borderWidth: 0 },
+          { 
+            data: dataParts, 
+            backgroundColor: colors, 
+            borderWidth: 2,
+            borderColor: '#ffffff'
+          },
         ],
       },
       options: {
         responsive: true,
         maintainAspectRatio: false,
-        cutout: '78%',
-        animation: { duration: 400 },
-        plugins: { legend: { display: false }, tooltip: { enabled: false } },
+        cutout: '75%',
+        animation: { 
+          duration: 600,
+          easing: 'easeInOutQuart'
+        },
+        plugins: { 
+          legend: { display: false }, 
+          tooltip: { enabled: false } 
+        },
       },
     });
     this.alertCharts.push(chart);

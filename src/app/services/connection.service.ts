@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { HttpClient, HttpHeaders } from '@angular/common/http';
+import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { tap } from 'rxjs/operators';
 import { environment } from '../../environments/environment';
@@ -22,17 +22,12 @@ export class ConnectionService {
 
     constructor(private http: HttpClient) { }
 
-    private getToken() {
-        const token = localStorage.getItem('ctrlf_token');
-        return { headers: new HttpHeaders({ Authorization: `Bearer ${token}` }) };
-    }
-
     /**
      * Busca todas as conexões ativas do usuário
      */
     getActiveConnections(): Observable<Connection[]> {
         const url = `${this.baseUrl}/status?status=ACTIVE`;
-        return this.http.get<Connection[]>(url, this.getToken()).pipe(
+        return this.http.get<Connection[]>(url).pipe(
             tap((connections) => {
                 console.log('🔗 Conexões ativas encontradas:', connections.length);
 

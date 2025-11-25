@@ -123,15 +123,16 @@ export class DashboardComponent implements OnInit, AfterViewInit, OnDestroy {
   }
 
   loadTransactions(): void {
-    this.transactionService.loadTransactions()
+    this.transactionService.loadAllTransactions()
       .pipe(
         takeUntil(this.destroy$),
         finalize(() => console.log('Transações carregadas'))
       )
       .subscribe({
-        next: (data: Transaction[]) => {
+        next: (data) => {
           console.log('Transações recebidas:', data?.length || 0);
-          this.transactions = data || [];
+          // Extrair apenas as transações dos metadados
+          this.transactions = data.map(item => item.transaction) || [];
           this.hasTransactions = this.transactions.length > 0;
 
           if (this.hasTransactions) {
@@ -143,7 +144,7 @@ export class DashboardComponent implements OnInit, AfterViewInit, OnDestroy {
             console.log('Nenhuma transação encontrada - gráficos não serão renderizados');
           }
         },
-        error: (err) => {
+        error: (err: any) => {
           console.error('Erro ao carregar transações:', err);
           this.transactions = [];
           this.hasTransactions = false;
