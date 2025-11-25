@@ -22,7 +22,7 @@ export interface UserProfile {
   providedIn: 'root'
 })
 export class AuthService {
-  private baseUrl = 'http://localhost:4000/auth';
+  private baseUrl = 'http://3.22.97.3:3000/auth';
 
   // Injeta ConnectionService, mas não podemos importar aqui para evitar dependência circular
   // Vamos fazer a injeção manual depois
@@ -178,7 +178,7 @@ export class AuthService {
       return throwError(() => new Error('No token available'));
     }
 
-    const url = 'http://localhost:4000/connection/status?status=ACTIVE';
+    const url = 'http://3.22.97.3:3000/connection/status?status=ACTIVE';
     const headers = { Authorization: `Bearer ${token}` };
 
     return this.http.get<any[]>(url, { headers }).pipe(
@@ -210,11 +210,11 @@ export class AuthService {
 
   private getBankNameFromUrl(targetApiUrl: string): string | null {
     const urlMap: Record<string, string> = {
-      'http://localhost:4001': 'Bruna',
-      'http://localhost:4002': 'Guilherme',
-      'http://localhost:4003': 'Larissa',
-      'http://localhost:5000': 'Leonardo',
-      'http://localhost:4005': 'Rodrigo'
+      'http://3.22.97.3:4001': 'Bruna',
+      'http://3.22.97.3:4002': 'Guilherme',
+      'http://3.22.97.3:4003': 'Larissa',
+      'http://3.22.97.3:3000': 'Leonardo',
+      'http://3.22.97.3:4005': 'Rodrigo'
     };
 
     return urlMap[targetApiUrl] || null;

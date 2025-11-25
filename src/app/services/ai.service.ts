@@ -17,7 +17,7 @@ export class AiService {
 
   enviarPrompt(userPrompt: string): Observable<string> {
     
-    const API_URL = 'http://localhost:4000/agent/ai/ask'; 
+    const API_URL = 'http://3.22.97.3:3000/agent/ai/ask'; 
 
     const body = { question: userPrompt }; 
     console.log('[AiService] POST', API_URL, body);
