@@ -13,7 +13,6 @@
   <div class="banks-list">
     @for (bankData of banksData; track bankData.bank.name) {
     <div class="bank-card" [ngStyle]="{ '--bank-color': bankData.bank.color }">
-      <!-- Header do Banco -->
       <div class="bank-header">
         <div class="bank-info">
           <div class="bank-icon" [ngStyle]="{ 'background-color': bankData.bank.color }">
@@ -42,7 +41,6 @@
         }
       </div>
 
-      <!-- Contas do Banco (se conectado) -->
       @if (bankData.isConnected) {
       <div class="accounts-section">
         @if (bankData.accounts && bankData.accounts.length > 0) {

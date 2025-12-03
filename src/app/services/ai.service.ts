@@ -17,12 +17,11 @@ export class AiService {
 
   enviarPrompt(userPrompt: string): Observable<string> {
     
-    const API_URL = 'http://3.22.97.3:3000/agent/ai/ask'; 
+    const API_URL = 'http://localhost:4000/agent/ai/ask'; 
 
     const body = { question: userPrompt }; 
     console.log('[AiService] POST', API_URL, body);
 
-    // O AuthInterceptor adiciona automaticamente o token no header
     return this.http.post<ApiResponse>(API_URL, body).pipe(
       tap({
         next: res => console.log('[AiService] resposta API:', res),

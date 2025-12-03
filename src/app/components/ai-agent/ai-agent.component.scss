@@ -30,18 +30,17 @@ color: #cccccc;
   animation: popUp 0.3s ease-out;
 }
 
-
 .chat-header {
   display: flex;
   align-items: center;
   width: 100%;
-  padding: 20px 20px; /* Adicionando o padding que perdemos do mat-card-header */
+  padding: 20px 20px;
 }
 
 .chat-title {
   margin-bottom: 0; 
-  font-size: 1.25rem; /* Adicionando o tamanho de fonte que perdemos do mat-card-title */
-  font-weight: 500;  /* Adicionando o peso de fonte que perdemos do mat-card-title */
+  font-size: 1.25rem;
+  font-weight: 500;
 }
 
 .close-button {

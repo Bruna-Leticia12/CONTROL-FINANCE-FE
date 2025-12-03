@@ -1,6 +1,5 @@
 <div class="bank-card" [ngStyle]="{ '--card-color': account.color }">
     <div class="card-inner">
-        <!-- Frente do cartão -->
         <div class="card-front">
             <div class="card-header">
                 <div class="card-chip"></div>
@@ -34,7 +33,6 @@
             </div>
         </div>
 
-        <!-- Botão de ação -->
         <div class="card-action">
             @if (!account.isConnected) {
             <button class="connect-btn" (click)="onConnect()">

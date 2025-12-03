@@ -1,5 +1,4 @@
 <div class="transactions-container">
-  <!-- Loading State -->
   @if (loading) {
     <div class="loading-state card">
       <div class="spinner"></div>
@@ -7,14 +6,12 @@
     </div>
   }
 
-  <!-- Error State -->
   @if (error && !loading) {
     <div class="error-state card">
-      <p>❌ Erro ao carregar transações. Tente novamente mais tarde.</p>
+      <p>Erro ao carregar transações. Tente novamente mais tarde.</p>
     </div>
   }
 
-  <!-- Summary Cards -->
   @if (!loading && !error && allTransactions.length > 0) {
     <div class="summary-cards">
       <div class="summary-card balance">
@@ -33,7 +30,6 @@
       </div>
     </div>
 
-    <!-- Transactions by Bank -->
     <div class="banks-container">
       @for (bank of groupedByBank; track bank.bankName) {
         <div class="bank-section card" [class.collapsed]="!bank.isExpanded">
@@ -44,20 +40,19 @@
                   <polyline points="6 9 12 15 18 9"></polyline>
                 </svg>
               </span>
-              <h2>🏦 {{ bank.bankName }}</h2>
+              <h2> {{ bank.bankName }}</h2>
             </div>
             <span class="bank-balance" [class.positive]="bank.totalBalance >= 0" [class.negative]="bank.totalBalance < 0">
               Saldo: R$ {{ bank.totalBalance.toFixed(2).replace('.', ',') }}
             </span>
           </div>
 
-          <!-- Accounts within this bank (only show if expanded) -->
           <div class="bank-content" [class.collapsed]="!bank.isExpanded">
             @if (bank.isExpanded) {
               @for (account of bank.accounts; track account.accountId) {
                 <div class="account-section">
                   <div class="account-header">
-                    <h3>💳 Conta: {{ account.accountNumber }}</h3>
+                    <h3> Conta: {{ account.accountNumber }}</h3>
                     <div class="account-stats">
                       <span class="stat credit">↑ R$ {{ account.totalCredit.toFixed(2).replace('.', ',') }}</span>
                       <span class="stat debit">↓ R$ {{ account.totalDebit.toFixed(2).replace('.', ',') }}</span>
@@ -67,7 +62,6 @@
                     </div>
                   </div>
 
-                  <!-- Transactions table -->
                   <div class="transactions-table-wrapper">
                     <table class="transactions-table">
                       <thead>
@@ -109,10 +103,9 @@
     </div>
   }
 
-  <!-- Empty State -->
   @if (!loading && !error && allTransactions.length === 0) {
     <div class="empty-state card">
-      <h2>📭 Nenhuma transação encontrada</h2>
+      <h2>Nenhuma transação encontrada</h2>
       <p>Conecte-se a um banco para visualizar suas transações.</p>
     </div>
   }

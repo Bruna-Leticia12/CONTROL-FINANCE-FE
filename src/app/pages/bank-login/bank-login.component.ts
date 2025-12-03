@@ -102,7 +102,6 @@ export class BankLoginComponent implements OnInit, OnDestroy {
         const normalizedName = bankName.toLowerCase();
         this.bankTheme = this.bankThemes[normalizedName] || this.bankTheme;
 
-        // Aplicar cor dinâmica na raiz do documento
         document.documentElement.style.setProperty(
             '--bank-primary',
             this.bankTheme.primaryColor
@@ -126,12 +125,10 @@ export class BankLoginComponent implements OnInit, OnDestroy {
         this.isLoading = true;
         this.errorMessage = '';
 
-        // Chamar endpoint REAL de login da API do banco
         this.authenticateWithBank();
     }
 
     private authenticateWithBank(): void {
-        // Extrair a URL base e fazer POST real no endpoint de login do banco
         const loginUrl = this.linkingUrl.split('?')[0];
 
         const body = {
@@ -139,7 +136,6 @@ export class BankLoginComponent implements OnInit, OnDestroy {
             password: this.password
         };
 
-        // Fazer requisição com os query params do linkingUrl
         this.http.post<any>(loginUrl, body, {
             params: {
                 connectionId: this.connectionId,
@@ -150,34 +146,27 @@ export class BankLoginComponent implements OnInit, OnDestroy {
             .subscribe({
                 next: (response: any) => {
                     console.log('Login no banco bem-sucedido:', response);
-                    console.log('🔑 ConnectionId a ser salvo:', this.connectionId);
-                    console.log('🏦 Banco conectado:', this.bankName);
+                    console.log('ConnectionId a ser salvo:', this.connectionId);
+                    console.log('Banco conectado:', this.bankName);
 
-                    // Salvar dados retornados pelo banco
                     if (response.customerId) {
                         sessionStorage.setItem('customerId', response.customerId);
-                        console.log('✅ CustomerId salvo:', response.customerId);
+                        console.log('CustomerId salvo:', response.customerId);
                     }
 
-                    // Salvar connectionId que já temos
                     sessionStorage.setItem('connectionId', this.connectionId);
-                    console.log('✅ ConnectionId salvo no sessionStorage');
+                    console.log('ConnectionId salvo no sessionStorage');
 
-                    // Salvar qual banco foi conectado (para marcar no dashboard)
                     sessionStorage.setItem('connectedBank', this.bankName);
-                    console.log('✅ ConnectedBank salvo:', this.bankName);
+                    console.log('ConnectedBank salvo:', this.bankName);
 
-                    // Verificar se realmente salvou
-                    console.log('📦 SessionStorage após save:', {
+                    console.log('SessionStorage após save:', {
                         connectionId: sessionStorage.getItem('connectionId'),
                         customerId: sessionStorage.getItem('customerId'),
                         connectedBank: sessionStorage.getItem('connectedBank')
                     });
 
                     this.isLoading = false;
-
-                    // A API do banco já deve ter chamado o /complete internamente
-                    // Então só redirecionar de volta ao dashboard
                     this.router.navigate(['/dashboard']);
                 },
                 error: (error: any) => {
@@ -209,7 +198,6 @@ export class BankLoginComponent implements OnInit, OnDestroy {
         this.destroy$.next();
         this.destroy$.complete();
 
-        // Limpar variáveis CSS
         document.documentElement.style.removeProperty('--bank-primary');
         document.documentElement.style.removeProperty('--bank-secondary');
         document.documentElement.style.removeProperty('--bank-gradient');

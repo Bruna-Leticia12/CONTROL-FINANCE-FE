@@ -18,12 +18,11 @@ export class AuthGuard implements CanActivate {
         const isLoggedIn = this.authService.isLoggedIn();
 
         if (isLoggedIn) {
-            console.log('✅ [AuthGuard] Acesso permitido');
+            console.log('[AuthGuard] Acesso permitido');
             return true;
         }
 
-        // Não está logado ou token expirado, redireciona para login
-        console.warn('🚫 [AuthGuard] Acesso negado - usuário não autenticado ou token expirado');
+        console.warn('[AuthGuard] Acesso negado - usuário não autenticado ou token expirado');
         
         this.router.navigate(['/login'], {
             queryParams: { 

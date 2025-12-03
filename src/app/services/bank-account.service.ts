@@ -38,17 +38,11 @@ export class BankAccountService {
         return this.banks;
     }
 
-    /**
-     * Verifica se há conexão ativa com algum banco
-     */
     hasActiveConnection(): boolean {
         const connectionId = sessionStorage.getItem('connectionId');
         return !!connectionId && connectionId !== 'null';
     }
 
-    /**
-     * Busca contas do banco conectado
-     */
     getConnectedBankAccounts(connectionId: string): Observable<any> {
         const url = `${this.baseUrl}/${connectionId}/accounts`;
         return this.http.get<any>(url).pipe(
@@ -59,22 +53,17 @@ export class BankAccountService {
         );
     }
 
-    /**
-     * Retorna informações completas de todos os bancos (conectados e não conectados)
-     */
     getAllBanksStatus(): Observable<BankAccountData[]> {
         const connectionId = sessionStorage.getItem('connectionId');
         const connectedBank = sessionStorage.getItem('connectedBank');
 
         if (!connectionId || !connectedBank) {
-            // Nenhuma conexão ativa - retornar todos como desconectados
             return of(this.banks.map(bank => ({
                 bank,
                 isConnected: false
             })));
         }
 
-        // Buscar contas do banco conectado
         return this.getConnectedBankAccounts(connectionId).pipe(
             map((accountsResponse: any) => {
                 return this.banks.map(bank => {

@@ -23,73 +23,61 @@ export class TransactionService {
     private connectionService: ConnectionService
   ) { }
 
-  /**
-   * Busca dados analíticos agregados por categoria (endpoint otimizado)
-   */
   getAnalytics(): Observable<any> {
     const url = `${environment.controlFinanceBackendUrl}/analytics/categories/me`;
-    console.log('📊 [TransactionService] Buscando analytics:', url);
+    console.log('[TransactionService] Buscando analytics:', url);
 
     return this.http.get<any>(url).pipe(
       catchError((error) => {
-        console.error('❌ [TransactionService] Erro ao buscar analytics:', error);
+        console.error('[TransactionService] Erro ao buscar analytics:', error);
         return of(null);
       })
     );
   }
 
-  /**
-   * Busca TODAS as transações de TODAS as contas de TODAS as conexões ativas
-   */
   loadAllTransactions(): Observable<TransactionWithMetadata[]> {
-    console.log('🔍 [TransactionService] Iniciando busca de todas as transações...');
-    console.log('🔑 [TransactionService] Token presente?', !!localStorage.getItem('ctrlf_token'));
+    console.log('[TransactionService] Iniciando busca de todas as transações...');
+    console.log('[TransactionService] Token presente?', !!localStorage.getItem('ctrlf_token'));
 
     return this.connectionService.getActiveConnections().pipe(
       switchMap((connections) => {
-        console.log('� [TransactionService] Conexões ativas:', connections.length);
+        console.log('[TransactionService] Conexões ativas:', connections.length);
 
         if (!connections || connections.length === 0) {
-          console.warn('⚠️ Nenhuma conexão ativa encontrada');
+          console.warn('Nenhuma conexão ativa encontrada');
           return of([]);
         }
 
-        // Para cada conexão, buscar contas e transações
         const allRequests = connections.map((connection) =>
           this.loadTransactionsForConnection(connection._id, connection.targetApiUrl)
         );
 
-        // Executar todas as requisições em paralelo e combinar resultados
         return forkJoin(allRequests).pipe(
           map((results) => results.flat())
         );
       }),
       catchError((error) => {
-        console.error('❌ [TransactionService] Erro ao carregar transações:', error);
+        console.error('[TransactionService] Erro ao carregar transações:', error);
         return of([]);
       })
     );
   }
 
-  /**
-   * Busca transações de uma conexão específica
-   */
   private loadTransactionsForConnection(
     connectionId: string,
     targetApiUrl: string
   ): Observable<TransactionWithMetadata[]> {
     const url = `${this.baseUrl}/${connectionId}/accounts`;
-    console.log('🌐 [loadTransactionsForConnection] Buscando contas de:', connectionId);
+    console.log('[loadTransactionsForConnection] Buscando contas de:', connectionId);
 
     return this.http.get<any[]>(url).pipe(
       switchMap((accounts) => {
-        console.log(`📊 [loadTransactionsForConnection] ${accounts.length} conta(s) encontrada(s)`);
+        console.log(`[loadTransactionsForConnection] ${accounts.length} conta(s) encontrada(s)`);
 
         if (!accounts || accounts.length === 0) {
           return of([]);
         }
 
-        // Para cada conta, buscar transações
         const transactionRequests = accounts.map((account) =>
           this.loadTransactionsForAccount(connectionId, account, targetApiUrl)
         );
@@ -99,15 +87,12 @@ export class TransactionService {
         );
       }),
       catchError((error) => {
-        console.error(`❌ Erro ao buscar contas da conexão ${connectionId}:`, error);
+        console.error(`Erro ao buscar contas da conexão ${connectionId}:`, error);
         return of([]);
       })
     );
   }
 
-  /**
-   * Busca transações de uma conta específica
-   */
   private loadTransactionsForAccount(
     connectionId: string,
     account: any,
@@ -116,14 +101,13 @@ export class TransactionService {
     const accountId = account.accountId || account._id || account.id;
     const url = `${this.baseUrl}/${connectionId}/accounts/${accountId}/transactions`;
 
-    console.log(`💰 [loadTransactionsForAccount] Buscando transações da conta ${accountId}`);
+    console.log(`[loadTransactionsForAccount] Buscando transações da conta ${accountId}`);
 
     return this.http.get<any>(url).pipe(
       map((response) => {
         const transactions = response.transactions || response || [];
-        console.log(`✅ ${transactions.length} transação(ões) encontrada(s) na conta ${accountId}`);
+        console.log(`${transactions.length} transação(ões) encontrada(s) na conta ${accountId}`);
 
-        // Adicionar metadados a cada transação
         return transactions.map((transaction: any) => ({
           transaction,
           accountId,
@@ -133,15 +117,12 @@ export class TransactionService {
         }));
       }),
       catchError((error) => {
-        console.error(`❌ Erro ao buscar transações da conta ${accountId}:`, error);
+        console.error(`Erro ao buscar transações da conta ${accountId}:`, error);
         return of([]);
       })
     );
   }
 
-  /**
-   * Extrai o nome do banco da URL
-   */
   private getBankNameFromUrl(url: string): string {
     const bankNames: Record<string, string> = {
       '4001': 'Banco Bruna',
@@ -160,12 +141,8 @@ export class TransactionService {
     return 'Banco Desconhecido';
   }
 
-  /**
-   * 🔹 Método auxiliar para somar valores por categoria e calcular esperados
-   * Pode ser usado em Dashboard, Metas e outras telas
-   */
   getCategorySums(transactions: any[]) {
-    const rendaDesc = ['Salario', 'Salário'];
+    const rendaDesc = ['Salario', 'Salário', 'salario', 'salário'];
     const despesaFixaDesc = [
       'Financiamento', 'Aluguel', 'Água', 'Luz', 'Internet',
       'Mercado', 'Transporte', 'Plano de Saúde', 'Medicamento',
@@ -184,8 +161,8 @@ export class TransactionService {
     };
 
     for (const t of transactions) {
-      const desc = t.description?.toLowerCase() || '';
-      const amount = Number(t.amount);
+      const desc = t.transaction?.description?.toLowerCase() || t.description?.toLowerCase() || '';
+      const amount = Number(t.transaction?.amount || t.amount );
 
       if (rendaDesc.some(d => desc.includes(d.toLowerCase()))) {
         sums.renda += amount;
@@ -200,7 +177,6 @@ export class TransactionService {
       }
     }
 
-    // ✅ Cálculo dinâmico com base na renda total
     const rendaTotal = sums.renda || 0;
     const expected = {
       despesasFixas: (rendaTotal * 60) / 100,

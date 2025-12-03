@@ -38,7 +38,6 @@
   box-sizing: border-box;
 }
 
-/* === Grid Principal: 2 Colunas === */
 .main-grid {
   display: grid;
   grid-template-columns: 400px 1fr;
@@ -48,7 +47,6 @@
   width: 100%;
 }
 
-/* === Seção de Resumo Financeiro (Coluna Esquerda) === */
 .financial-summary {
   display: flex;
   flex-direction: column;
@@ -130,7 +128,6 @@
   color: #059669;
 }
 
-/* === Seções === */
 .charts-section {
   display: flex;
   flex-direction: column;
@@ -166,7 +163,6 @@
   color: #64748b;
 }
 
-/* === Grid de Bancos === */
 .banks-grid {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
@@ -175,7 +171,6 @@
   padding: 4px;
 }
 
-/* === Grid de Gráficos (2 colunas) === */
 .charts-grid {
   display: grid;
   grid-template-columns: repeat(2, 1fr);
@@ -267,9 +262,6 @@ canvas {
   border: 1px solid rgba(0, 0, 0, 0.05);
 }
 
-/* === Responsividade === */
-
-/* Tablets grandes (< 1200px) */
 @media (max-width: 1200px) {
   .main-content {
     max-width: 100%;
@@ -298,7 +290,6 @@ canvas {
   }
 }
 
-/* Tablets (< 900px) */
 @media (max-width: 900px) {
   .main-content {
     padding: 24px 16px;
@@ -349,7 +340,6 @@ canvas {
   }
 }
 
-/* Mobile (< 600px) */
 @media (max-width: 600px) {
   .main-content {
     padding: 20px 12px;
@@ -414,7 +404,6 @@ canvas {
   }
 }
 
-/* Mobile pequeno (< 400px) */
 @media (max-width: 400px) {
   .main-content {
     padding: 16px 8px;

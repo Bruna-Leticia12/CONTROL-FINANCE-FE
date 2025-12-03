@@ -25,7 +25,6 @@ export class BannerCarouselComponent implements OnInit, OnDestroy {
     ];
 
     ngOnInit() {
-        // Iniciar autoplay após um pequeno delay para estabilizar o layout
         setTimeout(() => {
             this.startAutoPlay();
         }, 1000);
@@ -36,10 +35,8 @@ export class BannerCarouselComponent implements OnInit, OnDestroy {
     }
 
     startAutoPlay() {
-        // Limpar qualquer interval anterior
         this.stopAutoPlay();
 
-        // Usar requestAnimationFrame para melhor performance
         this.autoPlayInterval = setInterval(() => {
             requestAnimationFrame(() => {
                 this.nextSlide();

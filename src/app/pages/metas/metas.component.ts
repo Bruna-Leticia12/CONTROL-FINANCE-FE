@@ -62,7 +62,6 @@ export class MetasComponent implements AfterViewInit, OnDestroy {
   private loadData(): void {
     this.transactionService.loadAllTransactions().subscribe({
       next: (data) => {
-        // Extrair apenas as transações dos metadados
         const transactions = data.map(item => item.transaction);
         const categoryData = this.transactionService.getCategorySums(transactions);
         this.renda = categoryData.renda.value;

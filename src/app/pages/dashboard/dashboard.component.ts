@@ -21,6 +21,7 @@ import { BankCardComponent, BankAccount } from '../../components/bank-card/bank-
 import { EmptyStateComponent } from '../../components/empty-state/empty-state.component';
 import { ConfirmationDialogComponent } from '../../components/confirmation-dialog/confirmation-dialog.component';
 import { BannerCarouselComponent } from '../../components/banner-carousel/banner-carousel.component';
+import { isArray } from 'chart.js/helpers';
 
 Chart.register(ArcElement, Tooltip, Legend);
 
@@ -80,22 +81,21 @@ export class DashboardComponent implements OnInit, AfterViewInit, OnDestroy {
   ) { }
 
   ngOnInit(): void {
-    // Tentar buscar conexões ativas do backend (caso o sessionStorage esteja vazio)
     const connectionId = sessionStorage.getItem('connectionId');
 
     if (!connectionId || connectionId === 'null') {
-      console.log('🔄 SessionStorage vazio - tentando restaurar conexões...');
+      console.log('SessionStorage vazio - tentando restaurar conexões...');
       this.authService.restoreActiveConnections().subscribe({
         next: () => {
-          console.log('✅ Conexões restauradas no Dashboard');
+          console.log('Conexões restauradas no Dashboard');
           this.updateBankStatus();
         },
         error: (err) => {
-          console.warn('⚠️ Nenhuma conexão ativa encontrada ou erro ao restaurar:', err);
+          console.warn('Nenhuma conexão ativa encontrada ou erro ao restaurar:', err);
         }
       });
     } else {
-      console.log('✅ ConnectionId já presente no sessionStorage');
+      console.log('ConnectionId já presente no sessionStorage');
       this.updateBankStatus();
     }
   }
@@ -104,79 +104,54 @@ export class DashboardComponent implements OnInit, AfterViewInit, OnDestroy {
     const connectionId = sessionStorage.getItem('connectionId');
     const connectedBank = sessionStorage.getItem('connectedBank');
 
-    console.log('🔍 Verificando status - connectionId:', connectionId, 'bank:', connectedBank);
+    console.log('Verificando status - connectionId:', connectionId, 'bank:', connectedBank);
 
     if (connectionId && connectedBank) {
       const bank = this.bankAccounts.find(b => b.name.toLowerCase() === connectedBank.toLowerCase());
       if (bank) {
         bank.isConnected = true;
-        console.log(`✅ Banco ${bank.name} marcado como conectado`);
+        console.log(`Banco ${bank.name} marcado como conectado`);
       } else {
-        console.warn(`⚠️ Banco ${connectedBank} não encontrado na lista`);
+        console.warn(`Banco ${connectedBank} não encontrado na lista`);
       }
     }
   }
 
   ngAfterViewInit(): void {
-    // Sempre tentar carregar transações
-    // TransactionService já valida se há conexão ativa
+
     this.loadTransactions();
   }
 
-  loadTransactions(): void {
-    this.transactionService.getAnalytics()
+   loadTransactions(): void {
+    this.transactionService.loadAllTransactions()
       .pipe(
         takeUntil(this.destroy$),
-        finalize(() => console.log('Analytics carregados'))
+        finalize(() => console.log('Transações carregadas'))
       )
       .subscribe({
-        next: (analyticsData: any) => {
-          console.log('📊 Analytics recebidos:', analyticsData);
+        next: (data: any) => {
+          console.log('Transações recebidas:', data?.length || data?.transactions.length > 0 || 0);
+          this.transactions = isArray(data) ? data : data.transactions || [];
+          this.hasTransactions = this.transactions.length > 0
 
-          if (!analyticsData || !analyticsData.categories) {
-            console.warn('⚠️ Nenhum dado analítico encontrado');
-            this.hasTransactions = false;
-            return;
+          if (this.hasTransactions) {
+            console.log('Calculando categorias e renderizando gráficos...');
+            this.data = this.transactionService.getCategorySums(this.transactions);
+            this.calculateFinancialSummary();
+            
+            setTimeout(() => {
+              this.renderCharts();
+            });
+          } else {
+            console.log('Nenhuma transação encontrada - gráficos não serão renderizados');
           }
-
-          const categories = analyticsData.categories;
-          this.hasTransactions = true;
-
-          // Mapear categorias do backend para o formato do frontend
-          const rendaTotal = Math.abs(categories['Renda'] || 0);
-          const despesasFixasTotal = Math.abs(categories['Despesa Fixa'] || 0);
-          const pouparTotal = Math.abs(categories['Poupar'] || 0);
-          const lazerTotal = Math.abs(categories['Lazer'] || 0);
-          const imprevistosTotal = Math.abs(categories['Imprevistos'] || 0);
-
-          // Calcular expected com base na renda (50-30-20 ajustado)
-          const expected = {
-            despesasFixas: (rendaTotal * 60) / 100,
-            poupar: (rendaTotal * 20) / 100,
-            lazer: (rendaTotal * 15) / 100,
-            imprevistos: (rendaTotal * 5) / 100,
-          };
-
-          this.data = {
-            renda: { value: rendaTotal, expected: rendaTotal },
-            despesasFixas: { value: despesasFixasTotal, expected: expected.despesasFixas },
-            poupar: { value: pouparTotal, expected: expected.poupar },
-            lazer: { value: lazerTotal, expected: expected.lazer },
-            imprevistos: { value: imprevistosTotal, expected: expected.imprevistos },
-          };
-
-          console.log('💰 Dados processados:', this.data);
-          this.calculateFinancialSummary();
-
-          setTimeout(() => {
-            this.renderCharts();
-          });
         },
         error: (err: any) => {
-          console.error('❌ Erro ao carregar analytics:', err);
+          console.error('Erro ao carregar transações:', err);
+          this.transactions = [];
           this.hasTransactions = false;
         },
-        complete: () => console.log('✅ Observable de analytics completo')
+        complete: () => console.log('Observable de transações completo')
       });
   }
 
@@ -216,7 +191,6 @@ export class DashboardComponent implements OnInit, AfterViewInit, OnDestroy {
         next: (res: StartConnectionResponse) => {
           console.log('Conexão iniciada:', res);
 
-          // Redirecionar para tela de login do banco
           this.router.navigate(['/bank-login'], {
             queryParams: {
               connectionId: res.connectionId,

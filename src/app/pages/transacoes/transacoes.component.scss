@@ -4,7 +4,6 @@
   padding: 2rem;
 }
 
-/* Loading & Error States */
 .loading-state,
 .error-state,
 .empty-state {
@@ -30,7 +29,6 @@
   100% { transform: rotate(360deg); }
 }
 
-/* Summary Cards */
 .summary-cards {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
@@ -84,7 +82,6 @@
   }
 }
 
-/* Banks Container */
 .banks-container {
   display: flex;
   flex-direction: column;
@@ -168,7 +165,6 @@
   }
 }
 
-/* Bank Content Animation */
 .bank-content {
   max-height: 10000px;
   overflow: hidden;
@@ -182,7 +178,6 @@
   }
 }
 
-/* Accounts */
 .account-section {
   margin-bottom: 2rem;
   background: #f8f9fa;
@@ -246,7 +241,6 @@
   }
 }
 
-/* Transactions Table */
 .transactions-table-wrapper {
   overflow-x: auto;
 }
@@ -309,7 +303,6 @@
   }
 }
 
-/* Badges */
 .category-badge {
   display: inline-block;
   padding: 0.25rem 0.75rem;
@@ -338,7 +331,6 @@
   }
 }
 
-/* Responsive */
 @media (max-width: 768px) {
   .transactions-container {
     padding: 1rem;

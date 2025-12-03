@@ -32,8 +32,8 @@ import { filter } from 'rxjs/operators';
       padding-right: 16px;
       box-sizing: border-box;
       background: #f5f7fa;
-      height: 100vh; /* ajustado: substitui min-height */
-      overflow-y: auto; /* evita corte de conteúdo e remove margem branca */
+      height: 100vh;
+      overflow-y: auto;
     }
 
     .main-content.no-header {

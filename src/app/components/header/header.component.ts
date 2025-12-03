@@ -35,13 +35,10 @@ export class HeaderComponent implements OnInit {
   ) { }
 
   ngOnInit(): void {
-    // Buscar nome do usuário
     this.loadUserName();
 
-    // Atualizar path atual
     this.currentPath = this.router.url;
 
-    // Escutar mudanças de rota
     this.router.events.pipe(
       filter(event => event instanceof NavigationEnd)
     ).subscribe((event: any) => {
@@ -50,31 +47,27 @@ export class HeaderComponent implements OnInit {
   }
 
   loadUserName(): void {
-    // Tentar pegar do sessionStorage primeiro
     const cachedName = sessionStorage.getItem('userName');
     if (cachedName) {
       this.userName = cachedName;
     } else {
-      // Buscar do backend
       this.authService.getUserProfile().subscribe({
         next: (user) => {
           const firstName = user.name.split(' ')[0];
           this.userName = firstName;
         },
         error: (err) => {
-          console.warn('⚠️ Erro ao carregar nome do usuário:', err);
+          console.warn('Erro ao carregar nome do usuário:', err);
         }
       });
     }
   }
 
   get filteredMenuItems(): MenuItem[] {
-    // Filtrar item da página atual
     return this.allMenuItems.filter(item => item.path !== this.currentPath);
   }
 
   get showUserMenu(): boolean {
-    // Mostrar menu em todas as páginas autenticadas
     const publicRoutes = ['/login', '/register'];
     return !publicRoutes.includes(this.currentPath);
   }
@@ -90,11 +83,7 @@ export class HeaderComponent implements OnInit {
 
   logout() {
     this.menuOpen = false;
-
-    // Limpa TUDO: localStorage + sessionStorage
     this.authService.logout();
-
-    // Redireciona para login
     this.router.navigate(['/login']);
   }
 

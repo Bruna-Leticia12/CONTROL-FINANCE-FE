@@ -57,7 +57,6 @@ export class MyAccountsComponent implements OnInit {
       if (confirmed) {
         this.openFinanceConnectionService.startOpenFinanceConnection(bankName.toLowerCase()).subscribe(
           (res: StartConnectionResponse) => {
-            // Redirecionar para tela de login do banco
             this.router.navigate(['/bank-login'], {
               queryParams: {
                 connectionId: res.connectionId,

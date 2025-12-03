@@ -14,7 +14,7 @@ interface GroupedTransactions {
     totalDebit: number;
   }[];
   totalBalance: number;
-  isExpanded: boolean; // Controle de expansão do acordeão
+  isExpanded: boolean; 
 }
 
 @Component({
@@ -45,14 +45,14 @@ export class TransacoesComponent implements OnInit {
     this.loading = true;
     this.transactionService.loadAllTransactions().subscribe({
       next: (data) => {
-        console.log('📊 Transações carregadas:', data.length);
+        console.log('Transações carregadas:', data.length);
         this.allTransactions = data;
         this.groupTransactions();
         this.calculateTotals();
         this.loading = false;
       },
       error: (err) => {
-        console.error('❌ Erro ao carregar transações:', err);
+        console.error('Erro ao carregar transações:', err);
         this.error = true;
         this.loading = false;
       }
@@ -60,25 +60,22 @@ export class TransacoesComponent implements OnInit {
   }
 
   private groupTransactions(): void {
-    // Agrupar por banco e conta
     const bankMap = new Map<string, GroupedTransactions>();
 
     this.allTransactions.forEach((item) => {
       const { bankName, accountId, accountNumber, transaction } = item;
 
-      // Buscar ou criar grupo do banco
       if (!bankMap.has(bankName)) {
         bankMap.set(bankName, {
           bankName,
           accounts: [],
           totalBalance: 0,
-          isExpanded: false // Por padrão, começa colapsado
+          isExpanded: false
         });
       }
 
       const bank = bankMap.get(bankName)!;
 
-      // Buscar ou criar conta dentro do banco
       let account = bank.accounts.find(a => a.accountId === accountId);
       if (!account) {
         account = {
@@ -92,11 +89,9 @@ export class TransacoesComponent implements OnInit {
         bank.accounts.push(account);
       }
 
-      // Adicionar transação à conta
       account.transactions.push(item);
     });
 
-    // Calcular balanços de cada conta e banco
     bankMap.forEach((bank) => {
       bank.accounts.forEach((account) => {
         account.transactions.forEach((item) => {
@@ -115,7 +110,6 @@ export class TransacoesComponent implements OnInit {
 
     this.groupedByBank = Array.from(bankMap.values());
     
-    // Expandir apenas o primeiro banco por padrão
     if (this.groupedByBank.length > 0) {
       this.groupedByBank[0].isExpanded = true;
     }
